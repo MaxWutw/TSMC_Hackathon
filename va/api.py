@@ -12,7 +12,7 @@ from vertexai.generative_models import GenerativeModel
 import google.generativeai as genai
 import os
 
-credential_path = "./tsmccareerhack2025-aaid-grp2-b6ba1188b85e.json"
+credential_path = "./tsmccareerhack2025.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 PROJECT_ID = "tsmccareerhack2025-aaid-grp2"
 REGION = "us-central1"
