@@ -55,6 +55,7 @@ class LLM():
         print('\n\n\n')
         print('LLM Response:')
         print('-----------------------')
+        print(response)
         print(response.text)
         print('-----------------------')
         print('\n\n\n')

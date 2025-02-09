@@ -17,7 +17,8 @@ import utils
 
 
 
-url = "http://192.168.1.100:8003/vision"
+# url = "http://192.168.1.100:8003/vision"
+url = "http://127.0.0.1:8003/vision"
 
 def send_request(payload):
     # with open("test_input.json", "r") as file:

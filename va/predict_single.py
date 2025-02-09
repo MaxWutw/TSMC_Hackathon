@@ -14,7 +14,7 @@ if __name__ == '__main__':
     va = VisionAssistant(debug=True, timeout=50, output_root=output_root, is_thread = True, memory_limit_mb = 150)
     tic = time.time()
     for messages, artifact, ob in db:
-        if ob['id'] =="6370df4c-de52-4485-a798-b9a0d6eeb4a0":
+        if ob['id'] == "c1ada5be-4ab9-43c1-8742-8e1e384f7df1":
             # result = va.predict(messages, artifact)
             va.add_task(messages, artifact, ob)
     va.start_task(1)
