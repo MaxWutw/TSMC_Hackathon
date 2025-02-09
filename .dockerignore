@@ -1,0 +1,8 @@
+.git
+*.log
+Dockerfile
+grounding-dino-base/
+__pycache__/
+*.png
+output/
+data/
