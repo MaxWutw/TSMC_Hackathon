@@ -6,6 +6,8 @@ stages:
 
 install-dependencies:
   stage: install
+  script:
+    - echo "install dependencies"
 
 testing:
   stage: test
