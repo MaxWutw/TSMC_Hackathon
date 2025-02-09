@@ -16,7 +16,7 @@ testing:
 
 build-docker-image:
   stage: build
-  before-script:
+  before_script:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version)
   script:
     - docker build --build-arg TARGET_NAME=FunctionCalling -t grounding-dino-server:$IMAGE_VERSION .
