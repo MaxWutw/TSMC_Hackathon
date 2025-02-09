@@ -15,6 +15,7 @@ testing:
     - echo "testing"
 
 build-docker-image:
+  image: docker:20.10.16
   stage: build
   before_script:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version)
