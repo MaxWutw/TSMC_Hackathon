@@ -2,12 +2,12 @@ stages:
   - install
   - test
   - build
-  - publish
 
 install-dependencies:
   stage: install
   script:
     - echo "install dependencies"
+    - apt update && apt install -y jq
 
 testing:
   stage: test
