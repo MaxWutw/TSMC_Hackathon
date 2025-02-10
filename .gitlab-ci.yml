@@ -1,3 +1,8 @@
+variables:
+  DOCKER_RIGISTRY: registry.gitlab.com/maxwutw/tsmc_hackathon
+
+image: $DOCKER_RIGISTRY:latest
+
 stages:
   - install
   - test
@@ -15,13 +20,12 @@ testing:
     - echo "testing"
 
 build-docker-image:
-  image: docker:20.10.16
   stage: build
   before_script:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version)
   script:
-    - docker build --build-arg TARGET_NAME=FunctionCalling -t grounding-dino-server:$IMAGE_VERSION .
     - docker build --build-arg TARGET_NAME=VisionAssistant -t vision-assistant-server:$IMAGE_VERSION .
+    # - docker build --build-arg TARGET_NAME=FunctionCalling -t grounding-dino-server:$IMAGE_VERSION .
 
 # push-to-registry:
 #   stage: publish
