@@ -2,8 +2,15 @@ import api
 import time
 import requests
 from utils import convert_image_to_base64
-from config import IP
+import importlib.util
+import PIL
+
 class FUNCTIONS:
+    def __init__(self):
+        self.config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config.py"))
+        self.spec = importlib.util.spec_from_file_location("config", config_path)
+        self.config = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.config)
     """ All available functions for the GPT calling """
     """ Format:
 
@@ -98,7 +105,7 @@ class FUNCTIONS:
         """
         # url = "http://192.168.1.100:8001/dino"
         # url = "http://127.0.0.1:8001/dino"
-        url = IP + "/dino"
+        url = self.config.IP + str(self.config.DINO_PORT) + "/dino"
         payload = {
             'text': prompt,
             'img_base64': convert_image_to_base64(image)
@@ -117,41 +124,41 @@ class FUNCTIONS:
             print("Failed to connect to the server")
         return bboxes
 
-   def call_inpainting_image_generate(prompt: str, image: PIL.image) -> PIL.image:
-       url = IP + "/inpainting"
-       payload = {
+    def call_inpainting_image_generate(prompt: str, image: PIL.Image) -> PIL.Image:
+        url = self.config.IP + str(self.config.INPAINTING_PORT) + "/inpainting"
+        payload = {
             'text': prompt,
             'img_base64': convert_image_tobase64(image)
-       }
+        }
 
-       headers = {'Content-Type': 'application/json'}
-       tic = time.time()
-       response = request.post(url, json=payload, headers=headers)
-       toc = time.time()
-       print(f"Inpainting spend: {round(toc - tic, 3)} s")
-       if reponse.status_code == 200:
+        headers = {'Content-Type': 'application/json'}
+        tic = time.time()
+        response = request.post(url, json=payload, headers=headers)
+        toc = time.time()
+        print(f"Inpainting spend: {round(toc - tic, 3)} s")
+        if reponse.status_code == 200:
            # print("Response from server:", response.json())
            gen_image = response.json()['base64']
-       else:
+        else:
            print("Failed to connect to the server")
 
-       return gen_image
+        return gen_image
 
-   def call_text_to_image_generate(prompt: str) -> PIL.image:
-       url = IP + "/imagen"
-       payload = {
+    def call_text_to_image_generate(prompt: str) -> PIL.Image:
+        url = self.config.IP + str(self.config.IMAGEN_PORT) + "/imagen"
+        payload = {
             'text': prompt,
-       }
+        }
 
-       headers = {'Content-Type': 'application/json'}
-       tic = time.time()
-       response = request.post(url, json=payload, headers=headers)
-       toc = time.time()
-       print(f"Imagen spend: {round(toc - tic, 3)} s")
-       if reponse.status_code == 200:
+        headers = {'Content-Type': 'application/json'}
+        tic = time.time()
+        response = request.post(url, json=payload, headers=headers)
+        toc = time.time()
+        print(f"Imagen spend: {round(toc - tic, 3)} s")
+        if reponse.status_code == 200:
            # print("Response from server:", response.json())
            gen_image = response.json()['base64']
-       else:
+        else:
            print("Failed to connect to the server")
 
-       return gen_image
+        return gen_image
