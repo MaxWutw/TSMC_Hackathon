@@ -33,8 +33,8 @@ build-docker-image:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
     - docker --version
   script:
-    - docker build --build-arg TARGET_NAME=VisionAssistant -t visionassistantserver:$IMAGE_VERSION .
-    # - docker build --build-arg TARGET_NAME=FunctionCalling -t grounding-dino-server:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=visionassistant -t visionassistantserver:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=functioncalling -t grounding-dino-server:$IMAGE_VERSION .
 
 # push-to-registry:
 #   stage: publish

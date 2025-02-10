@@ -1,5 +1,5 @@
 # Function Calling Flask
-FROM pytorch/pytorch:latest AS FunctionCalling
+FROM pytorch/pytorch:latest AS functioncalling
 
 EXPOSE 8001
 WORKDIR /workspace
@@ -13,7 +13,7 @@ RUN mkdir -p grounding-dino-base
 CMD ["python3", "dino_service.py"]
 
 # Vision Assistant
-FROM python:3.9-slim AS VisionAssistant
+FROM python:3.9-slim AS visionassistant
 
 EXPOSE 8003
 WORKDIR /app
