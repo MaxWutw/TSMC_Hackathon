@@ -10,9 +10,9 @@ url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 image = Image.open(requests.get(url, stream=True).raw)
 text = "a cat."
 # %%
-url = "http://192.168.1.100:8001/dino"
+url = "http://localhost:8001/dino"
 payload = {
-    'text': 'cat',
+    'text': 'cat, but you should only contains the cat without the background.',
     'img_base64': convert_image_to_base64(image)
 }
 

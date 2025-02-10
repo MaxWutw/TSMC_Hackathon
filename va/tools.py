@@ -95,7 +95,7 @@ class FUNCTIONS:
             [[1353, 183, 1932., 736],
             [296, 64, 1147, 663]]
         """
-        url = "http://192.168.1.100:8001/dino"
+        url = "http://localhost:8001/dino"
         payload = {
             'text': prompt,
             'img_base64': convert_image_to_base64(image)
