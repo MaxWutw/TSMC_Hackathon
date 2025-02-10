@@ -1,7 +1,11 @@
 variables:
   DOCKER_RIGISTRY: registry.gitlab.com/maxwutw/tsmc_hackathon
+  DOCKER_DRIVER: overlay2
 
 image: $DOCKER_RIGISTRY:latest
+
+services:
+  - docker:dind
 
 stages:
   - install
@@ -23,6 +27,7 @@ build-docker-image:
   stage: build
   before_script:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+    - docker --version
   script:
     - docker build --build-arg TARGET_NAME=VisionAssistant -t visionassistantserver:$IMAGE_VERSION .
     # - docker build --build-arg TARGET_NAME=FunctionCalling -t grounding-dino-server:$IMAGE_VERSION .
