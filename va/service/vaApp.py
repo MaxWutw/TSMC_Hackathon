@@ -17,6 +17,7 @@ from PIL import Image
 from utils import check_dir, convert_image_to_base64, parser_np
 from data_manager import DataManagerService
 from agent.vision_assistant_agent import VisionAssistant
+import importlib.util
 
 app = Flask(__name__)
 @app.route('/vision', methods=['POST'])
@@ -54,4 +55,10 @@ def hello_world():
     return jsonify(message="Hello, World!")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8003, threaded=True)
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../..", "config.py"))
+    spec = importlib.util.spec_from_file_location("config", config_path)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+
+    # app.run(host=config.IP, port=config.VISIONASSISTANT_PORT, threaded=True)
+    app.run(host="0.0.0.0", port=8001, threaded=True)

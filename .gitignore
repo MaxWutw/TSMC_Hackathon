@@ -6,3 +6,4 @@ tsmccareerhack2025.json
 /tool/*.png
 /va/*.png
 __pycache__/
+/tool/output_img/

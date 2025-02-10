@@ -10,7 +10,7 @@ url = "../va/ref.png"
 image = Image.open(url)
 text = "Help me convert the bear in the images into lion.,You can detect the bear in the image and use image generator to generate the lino and replace the bear to lion.Supply the end result as a PIL.Image object."
 # %%
-url = "http://127.0.0.1:8005/inpainting"
+url = "http://127.0.0.1:8002/inpainting"
 payload = {
     'text': text,
     'img_base64': convert_image_to_base64(image)

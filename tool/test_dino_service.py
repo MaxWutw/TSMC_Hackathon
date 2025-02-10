@@ -13,7 +13,7 @@ image = Image.open(url)
 text = "a cat."
 # %%
 # url = "http://192.168.1.100:8001/dino"
-url = "http://127.0.0.1:8001/dino"
+url = "http://127.0.0.1:8002/dino"
 payload = {
     'text': 'cat',
     'img_base64': convert_image_to_base64(image)

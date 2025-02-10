@@ -7,7 +7,7 @@ import time
 
 text = "Give me a dog sitting on the sofa."
 # %%
-url = "http://127.0.0.1:8004/imagen"
+url = "http://127.0.0.1:8002/imagen"
 payload = {
     'text': text,
 }

@@ -8,6 +8,8 @@ import random
 from flask import Flask, jsonify, request
 from utils import convert_base64_to_image
 import importlib.util
+import os
+import base64
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = "cpu"
@@ -46,4 +48,4 @@ if __name__ == '__main__':
     spec = importlib.util.spec_from_file_location("config", config_path)
     config = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(config)
-    app.run(host='0.0.0.0', port=8001, threaded=False)
+    app.run(host=config.IP, port=config.DINO_PORT, threaded=False)
