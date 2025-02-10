@@ -1,3 +1,6 @@
 127.0.0.1 - - [09/Feb/2025:19:58:05 +0800] "GET /api HTTP/1.1" 200 28 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0"
 127.0.0.1 - - [09/Feb/2025:19:58:05 +0800] "GET /favicon.ico HTTP/1.1" 404 207 "http://127.0.0.1:8003/api" "Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0"
 127.0.0.1 - - [09/Feb/2025:20:00:11 +0800] "POST /vision HTTP/1.1" 200 777 "-" "python-requests/2.32.3"
+127.0.0.1 - - [10/Feb/2025:12:56:21 +0800] "POST /vision HTTP/1.1" 200 98 "-" "python-requests/2.32.3"
+127.0.0.1 - - [10/Feb/2025:13:01:35 +0800] "POST /vision HTTP/1.1" 200 98 "-" "python-requests/2.32.3"
+127.0.0.1 - - [10/Feb/2025:13:05:45 +0800] "POST /vision HTTP/1.1" 200 98 "-" "python-requests/2.32.3"
