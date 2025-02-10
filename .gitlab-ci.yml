@@ -23,7 +23,6 @@ build-docker-image:
   stage: build
   before_script:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
-    - echo "IMAGE_VERSION=$IMAGE_VERSION" >> $CI_ENVIRONMENT_FILE
   script:
     - docker build --build-arg TARGET_NAME=VisionAssistant -t visionassistantserver:$IMAGE_VERSION .
     # - docker build --build-arg TARGET_NAME=FunctionCalling -t grounding-dino-server:$IMAGE_VERSION .
