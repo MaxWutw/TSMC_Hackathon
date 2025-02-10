@@ -1,6 +1,7 @@
 import json
 import requests
 from concurrent.futures import ThreadPoolExecutor
+from utils import convert_image_to_base64, convert_base64_to_image
 import pandas as pd
 import os
 from PIL import Image
@@ -17,16 +18,19 @@ import utils
 
 
 
-# url = "http://192.168.1.100:8003/vision"
-url = "http://127.0.0.1:8003/vision"
+# url = "http://192.168.1.100:8001/vision"
+url = "http://127.0.0.1:8001/vision"
 
 def send_request(payload):
     # with open("test_input.json", "r") as file:
     #     payload = json.load(file)
     headers = {'Content-Type': 'application/json'}
     response = requests.post(url, json=payload, headers=headers)
+    print(response)
     if response.status_code == 200:
         print("Response from server:", response.json())
+        image = response.json()['result']
+        convert_base64_to_image(image).save('output.png')
     else:
         print("Failed to connect to the server")
 
@@ -60,6 +64,7 @@ def get_artifact(ob, data_root):
 if __name__ == '__main__':
     num_requests = 1
     csv_path = f'../data/testcase.csv'
+    # csv_path = f'../data/release_public_set.csv'
     data_root = '..'
     output_root = '../test_output'
     db = pd.read_csv(csv_path)

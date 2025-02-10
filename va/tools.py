@@ -105,7 +105,7 @@ class FUNCTIONS:
         """
         # url = "http://192.168.1.100:8001/dino"
         # url = "http://127.0.0.1:8001/dino"
-        url = self.config.IP + str(self.config.DINO_PORT) + "/dino"
+        url = self.config.IP + str(self.config.API_PORT) + "/dino"
         payload = {
             'text': prompt,
             'img_base64': convert_image_to_base64(image)
@@ -125,7 +125,7 @@ class FUNCTIONS:
         return bboxes
 
     def call_inpainting_image_generate(prompt: str, image: PIL.Image) -> PIL.Image:
-        url = self.config.IP + str(self.config.INPAINTING_PORT) + "/inpainting"
+        url = self.config.IP + str(self.config.API_PORT) + "/inpainting"
         payload = {
             'text': prompt,
             'img_base64': convert_image_tobase64(image)
@@ -145,7 +145,7 @@ class FUNCTIONS:
         return gen_image
 
     def call_text_to_image_generate(prompt: str) -> PIL.Image:
-        url = self.config.IP + str(self.config.IMAGEN_PORT) + "/imagen"
+        url = self.config.IP + str(self.config.API_PORT) + "/imagen"
         payload = {
             'text': prompt,
         }
