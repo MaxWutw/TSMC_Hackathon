@@ -7,7 +7,9 @@ import random
 import time
 
 url = "http://images.cocodataset.org/val2017/000000039769.jpg"
-image = Image.open(requests.get(url, stream=True).raw)
+url = "../va/test.png"
+# image = Image.open(requests.get(url, stream=True).raw)
+image = Image.open(url)
 text = "a cat."
 # %%
 # url = "http://192.168.1.100:8001/dino"

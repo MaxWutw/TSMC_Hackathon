@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from flask import Flask, jsonify, request
-from utils import convert_base64_to_image, get_base64
+from utils import convert_base64_to_image, get_base64, get_file_b64str
 import os
 import importlib.util
 import base64
@@ -45,8 +45,8 @@ def generate():
     # images[0].show()
 
     print(f"Created output image using {len(images[0]._image_bytes)} bytes")
-    with open(output_file, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
+    ret = get_file_b64str(output_file)
+    return jsonify({"base64": ret}) 
 
 @app.route('/api', methods=['GET'])
 def check():

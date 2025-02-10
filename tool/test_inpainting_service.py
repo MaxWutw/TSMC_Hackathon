@@ -1,3 +1,4 @@
+#%%
 from utils import convert_image_to_base64, convert_base64_to_image
 from PIL import Image
 import requests
@@ -5,11 +6,14 @@ import numpy as np
 import random
 import time
 
-text = "Give me a dog sitting on the sofa."
+url = "../va/ref.png"
+image = Image.open(url)
+text = "Help me convert the bear in the images into lion.,You can detect the bear in the image and use image generator to generate the lino and replace the bear to lion.Supply the end result as a PIL.Image object."
 # %%
-url = "http://127.0.0.1:8004/imagen"
+url = "http://127.0.0.1:8005/inpainting"
 payload = {
     'text': text,
+    'img_base64': convert_image_to_base64(image)
 }
 
 headers = {'Content-Type': 'application/json'}
@@ -25,4 +29,4 @@ if response.status_code == 200:
 else:
     print("Failed to connect to the server")
 # %%
-convert_base64_to_image(image).save('output1.png')
+convert_base64_to_image(image).save('output.png')

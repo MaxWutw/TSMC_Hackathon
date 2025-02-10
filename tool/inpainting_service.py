@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from flask import Flask, jsonify, request
-from utils import convert_base64_to_image, get_base64
+from utils import convert_base64_to_image, get_base64, get_file_b64str
 import os
 import importlib.util
 import base64
@@ -39,27 +39,12 @@ def generate():
         prompt=text,
         edit_mode="inpainting-remove",
     )
-    # images = model.generate_images(
-    #     prompt=text,
-    #     # Optional parameters
-    #     number_of_images=1,
-    #     language="en",
-    #     # You can't use a seed value and watermark at the same time.
-    #     # add_watermark=False,
-    #     # seed=100,
-    #     aspect_ratio="1:1",
-    #     safety_filter_level="block_some",
-    #     # person_generation="allow_adult",
-    # )
 
     images[0].save(location=output_file, include_generation_parameters=False)
 
-    # Optional. View the generated image in a notebook.
-    # images[0].show()
-
     print(f"Created output image using {len(images[0]._image_bytes)} bytes")
-    with open(output_file, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
+    ret = get_file_b64str(output_file)
+    return jsonify({"base64": ret}) 
 
 @app.route('/api', methods=['GET'])
 def check():
@@ -78,5 +63,5 @@ if __name__ == '__main__':
     # prompt = "Please draw me 3 dogs"
 
     vertexai.init(project=PROJECT_ID, location="us-central1")
-    app.run(host=config.IP, port=8005, threaded=False)
+    app.run(host=config.IP, port=config.INPAINTING_PORT, threaded=False)
 

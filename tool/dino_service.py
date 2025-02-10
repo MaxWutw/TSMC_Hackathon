@@ -7,6 +7,7 @@ import numpy as np
 import random
 from flask import Flask, jsonify, request
 from utils import convert_base64_to_image
+import importlib.util
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = "cpu"
@@ -41,4 +42,8 @@ def hello_world():
     return jsonify(message="Grounding Dino is running!")
 
 if __name__ == '__main__':
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config.py"))
+    spec = importlib.util.spec_from_file_location("config", config_path)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
     app.run(host='0.0.0.0', port=8001, threaded=False)
