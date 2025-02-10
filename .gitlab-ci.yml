@@ -34,7 +34,9 @@ build-docker-image:
     - docker --version
   script:
     - docker build --build-arg TARGET_NAME=visionassistant -t visionassistantserver:$IMAGE_VERSION .
-    - docker build --build-arg TARGET_NAME=functioncalling -t grounding-dino-server:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=groundingdino -t groundingdinoserver:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=inpainting -t inpaintingserver:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=imagen -t imagenserver:$IMAGE_VERSION .
 
 # push-to-registry:
 #   stage: publish
