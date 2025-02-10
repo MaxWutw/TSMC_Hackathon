@@ -12,7 +12,8 @@ import os
 import base64
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = "cpu"
+# device = "cpu"
+device = torch.device("cpu")
 print(f"Your device is: {device}")
 processor_dino = AutoProcessor.from_pretrained("grounding-dino-base")
 model_dino = GroundingDinoForObjectDetection.from_pretrained("grounding-dino-base").to(device)
