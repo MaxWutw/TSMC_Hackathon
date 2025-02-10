@@ -2,6 +2,7 @@ import api
 import time
 import requests
 from utils import convert_image_to_base64
+from config import IP
 class FUNCTIONS:
     """ All available functions for the GPT calling """
     """ Format:
@@ -96,7 +97,8 @@ class FUNCTIONS:
             [296, 64, 1147, 663]]
         """
         # url = "http://192.168.1.100:8001/dino"
-        url = "http://127.0.0.1:8001/dino"
+        # url = "http://127.0.0.1:8001/dino"
+        url = IP + "/dino"
         payload = {
             'text': prompt,
             'img_base64': convert_image_to_base64(image)
@@ -114,3 +116,43 @@ class FUNCTIONS:
         else:
             print("Failed to connect to the server")
         return bboxes
+
+   def call_inpainting_image_generate(prompt: str, image: PIL.image) -> PIL.image:
+       url = IP + "/inpainting"
+       payload = {
+            'text': prompt,
+            'img_base64': convert_image_tobase64(image)
+       }
+
+       headers = {'Content-Type': 'application/json'}
+       tic = time.time()
+       response = request.post(url, json=payload, headers=headers)
+       toc = time.time()
+       print(f"Imagen spend: {round(toc - tic, 3)} s")
+       if reponse.status_code == 200:
+           print("Response from server:", response.json())
+           gen_image = response.json()
+       else:
+           print("Failed to connect to the server")
+
+       return gen_image
+
+   def call_text_to_image_generate(prompt: str) -> PIL.image:
+       url = IP + "/imagen"
+       payload = {
+            'text': prompt,
+            'img_base64': convert_image_tobase64(image)
+       }
+
+       headers = {'Content-Type': 'application/json'}
+       tic = time.time()
+       response = request.post(url, json=payload, headers=headers)
+       toc = time.time()
+       print(f"Imagen spend: {round(toc - tic, 3)} s")
+       if reponse.status_code == 200:
+           print("Response from server:", response.json())
+           gen_image = response.json()
+       else:
+           print("Failed to connect to the server")
+
+       return gen_image

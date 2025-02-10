@@ -59,9 +59,9 @@ def get_artifact(ob, data_root):
 
 if __name__ == '__main__':
     num_requests = 1
-    csv_path = f'../data/release_public_set.csv'
+    csv_path = f'../data/testcase.csv'
     data_root = '..'
-    output_root = '../output'
+    output_root = '../test_output'
     db = pd.read_csv(csv_path)
     ob = db.iloc[0,:]
     send_request(get_payload(ob, data_root))
