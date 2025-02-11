@@ -51,7 +51,8 @@ push-to-registry:
     - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
   script:
-    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:$IMAGE_VERSION
-    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:$IMAGE_VERSION
+    - echo "$IMAGE_VERSION"
+    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:${IMAGE_VERSION}
+    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:${IMAGE_VERSION}
 
 
