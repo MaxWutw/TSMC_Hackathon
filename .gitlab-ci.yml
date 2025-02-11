@@ -34,7 +34,7 @@ build-docker-image:
   stage: build
   image: docker:latest
   before_script:
-    - apt update && apt install -y jq
+    - apk update && apk add jq
     - docker --version
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
   script:
