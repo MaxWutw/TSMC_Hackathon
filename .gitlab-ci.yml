@@ -33,7 +33,7 @@ testing:
 build-docker-image:
   stage: build
   image: docker:latest
-  before_script:
+  before-script:
     - apt update && apt install -y jq
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
     - docker --version
