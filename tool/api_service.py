@@ -49,6 +49,7 @@ def image_generate():
 
 @app.route('/inpainting', methods=['POST'])
 def inpainting_generate():
+
     output_file = "output_img/input-image2.png"
 
     input_data = request.get_json()
@@ -106,6 +107,10 @@ def check():
     return jsonify(message="Imagen is running!")
 
 if __name__ == '__main__':
+
+    if not os.path.exists("output_img"):
+        os.mkdir("output_img")
+
     config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config.py"))
     spec = importlib.util.spec_from_file_location("config", config_path)
     config = importlib.util.module_from_spec(spec)

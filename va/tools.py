@@ -99,6 +99,7 @@ class FUNCTIONS:
             [296, 64, 1147, 663]]
         """
         # url = "http://192.168.1.100:8001/dino"
+        
         url = "http://127.0.0.1:8002/dino"
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/dino"
         payload = {
@@ -141,6 +142,7 @@ class FUNCTIONS:
             {'base64': 'two dogs image base64 encoded value'}
         """
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/inpainting"
+        
         url = "http://127.0.0.1:8002/inpainting"
         payload = {
             'text': prompt,
@@ -148,10 +150,10 @@ class FUNCTIONS:
         }
         headers = {'Content-Type': 'application/json'}
         tic = time.time()
-        response = request.post(url, json=payload, headers=headers)
+        response = requests.post(url, json=payload, headers=headers)
         toc = time.time()
         print(f"Inpainting spend: {round(toc - tic, 3)} s")
-        if reponse.status_code == 200:
+        if response.status_code == 200:
            # print("Response from server:", response.json())
            gen_image = response.json()['base64']
         else:
@@ -178,6 +180,7 @@ class FUNCTIONS:
             {'base64': 'a dog sitting on the sofa base64 encoded value'}
         """
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/imagen"
+        
         url = "http://127.0.0.1:8002/imagen"
         payload = {
             'text': prompt,
@@ -185,10 +188,10 @@ class FUNCTIONS:
 
         headers = {'Content-Type': 'application/json'}
         tic = time.time()
-        response = request.post(url, json=payload, headers=headers)
+        response = requests.post(url, json=payload, headers=headers)
         toc = time.time()
         print(f"Imagen spend: {round(toc - tic, 3)} s")
-        if reponse.status_code == 200:
+        if response.status_code == 200:
            # print("Response from server:", response.json())
            gen_image = response.json()['base64']
         else:
