@@ -28,7 +28,7 @@ def send_request(payload):
     response = requests.post(url, json=payload, headers=headers)
     print(response)
     if response.status_code == 200:
-        print("Response from server:", response.json())
+        # print("Response from server:", response.json())
         image = response.json()['result']
         convert_base64_to_image(image).save('output.png')
     else:

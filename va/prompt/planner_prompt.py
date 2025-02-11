@@ -22,6 +22,7 @@ PLAN = """
 10. Stop right after you got 1 </execute_python>.
 11. Do not use placeholder.
 12. Do not install package through pip.
+13. If you get the base64 data, you can return immediately, instead of turn it into PIL.IMAGE.
 
 The tag must needs:
 <thinking>Your thought process...</thinking>

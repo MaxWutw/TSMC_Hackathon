@@ -16,10 +16,9 @@ import base64
 
 app = Flask(__name__)
 @app.route('/imagen', methods=['POST'])
-def image_generate():
-    output_file = "output_img/input-image1.png"
-
+def image_predict():
     input_data = request.get_json()
+    output_file = "output_img/input-image1.png"
     text = input_data['text']
     if '.' not in text:
         text+='.'
@@ -48,11 +47,10 @@ def image_generate():
     return jsonify({"base64": ret}) 
 
 @app.route('/inpainting', methods=['POST'])
-def inpainting_generate():
-
-    output_file = "output_img/input-image2.png"
-
+def inpainting_predict():
     input_data = request.get_json()
+    output_file = "output_img/input-image2.png"
+    print(output_file)
     raw_image = input_data['img_base64']
     raw_image = convert_base64_to_image(raw_image)
     # with open("tmp_inpainting.png", "wb") as ti:
@@ -119,8 +117,6 @@ if __name__ == '__main__':
     PROJECT_ID = "tsmccareerhack2025-aaid-grp2"
     credential_path = "../va/tsmccareerhack2025.json"
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
-    # output_file = "output_img/input-image2.png"
-    # prompt = "Please draw me 3 dogs"
 
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     device = "cpu"
