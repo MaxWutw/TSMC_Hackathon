@@ -45,6 +45,7 @@ push-to-registry:
   stage: publish
   image: google/cloud-sdk:latest
   before_script:
+    - apt update && apt install -y jq
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
     - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
