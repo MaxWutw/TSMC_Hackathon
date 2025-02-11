@@ -5,6 +5,10 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
+  # GCP variables
+  GCP_PROJECT_ID: tsmccareerhack2025-aaid-grp2
+  GCP_REGISTRY_LOCATION: us-central1
+  GCP_REGISTRY_NAME: tsmccareerhack2025-aaid-grp2-repository
 
 services:
   - docker:dind
@@ -13,6 +17,7 @@ stages:
   - install
   - test
   - build
+  - publish
 
 install-dependencies:
   stage: install
@@ -33,10 +38,21 @@ build-docker-image:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
     - docker --version
   script:
-    - docker build --build-arg TARGET_NAME=visionassistant -t visionassistantserver:$IMAGE_VERSION .
-    - docker build --build-arg TARGET_NAME=groundingdino -t groundingdinoserver:$IMAGE_VERSION .
-    - docker build --build-arg TARGET_NAME=inpainting -t inpaintingserver:$IMAGE_VERSION .
-    - docker build --build-arg TARGET_NAME=imagen -t imagenserver:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=visionassistant \
+    -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=functioncalling \
+    -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:$IMAGE_VERSION .
 
-# push-to-registry:
-#   stage: publish
+push-to-registry:
+  stage: publish
+  image: google/cloud-sdk:latest
+  before-script:
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
+    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+  script:
+    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:$IMAGE_VERSION
+    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:$IMAGE_VERSION
+
+
