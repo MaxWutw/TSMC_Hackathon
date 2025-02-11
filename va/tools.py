@@ -6,11 +6,6 @@ import importlib.util
 import PIL
 
 class FUNCTIONS:
-    def __init__(self):
-        self.config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config.py"))
-        self.spec = importlib.util.spec_from_file_location("config", config_path)
-        self.config = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(self.config)
     """ All available functions for the GPT calling """
     """ Format:
 
@@ -104,8 +99,8 @@ class FUNCTIONS:
             [296, 64, 1147, 663]]
         """
         # url = "http://192.168.1.100:8001/dino"
-        # url = "http://127.0.0.1:8001/dino"
-        url = self.config.IP + str(self.config.API_PORT) + "/dino"
+        url = "http://127.0.0.1:8002/dino"
+        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/dino"
         payload = {
             'text': prompt,
             'img_base64': convert_image_to_base64(image)
@@ -124,13 +119,33 @@ class FUNCTIONS:
             print("Failed to connect to the server")
         return bboxes
 
-    def call_inpainting_image_generate(prompt: str, image: PIL.Image) -> PIL.Image:
-        url = self.config.IP + str(self.config.API_PORT) + "/inpainting"
+    def call_inpainting_image_generate(prompt, image):
+        """'call_inpainting_image_generate' is a tool that helps you replace specific targets in an image with other images. 
+        You can specify which targets you want to replace using a prompt.
+        When using it, you only need to provide me with the original image and a prompt specifying which part you want to replace. 
+        There is no need to provide a mask.
+        The return value is a JSON object containing a single field: the base64-encoded string of the modified image. 
+        You can retrieve this string using return_image.json()['base64'].
+
+        Parameters:
+            prompt (str): The prompt to ground to the image.
+            image (PIL.Image): The image to ground the prompt to.
+
+        Returns:
+            Base64 encoding: A method of representing binary data using 64 printable characters.
+            The returned data will be in the format: {'base64': 'encoded data'}.
+
+        Example:
+        -------
+            >>> call_inpainting_image_generate("Replace the two cats in the image with two small dogs.", image)
+            {'base64': 'two dogs image base64 encoded value'}
+        """
+        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/inpainting"
+        url = "http://127.0.0.1:8002/inpainting"
         payload = {
             'text': prompt,
-            'img_base64': convert_image_tobase64(image)
+            'img_base64': convert_image_to_base64(image)
         }
-
         headers = {'Content-Type': 'application/json'}
         tic = time.time()
         response = request.post(url, json=payload, headers=headers)
@@ -144,8 +159,26 @@ class FUNCTIONS:
 
         return gen_image
 
-    def call_text_to_image_generate(prompt: str) -> PIL.Image:
-        url = self.config.IP + str(self.config.API_PORT) + "/imagen"
+    def call_text_to_image_generate(prompt):
+        """'call_text_to_image_generate' is a tool that generates an image based on a given prompt.
+        By providing a detailed prompt, you can obtain a result that better matches your expectations.
+        The return value is a JSON object containing a single field: the base64-encoded string of the generated image. 
+        You can retrieve this string using return_image.json()['base64'].
+
+        Parameters:
+            prompt (str): The prompt to ground to the image.
+
+        Returns:
+            Base64 encoding: A method of representing binary data using 64 printable characters.
+            The returned data will be in the format: {'base64': 'encoded data'}.
+
+        Example:
+        -------
+            >>> call_inpainting_image_generate("help me generate a dog sitting on the sofa")
+            {'base64': 'a dog sitting on the sofa base64 encoded value'}
+        """
+        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/imagen"
+        url = "http://127.0.0.1:8002/imagen"
         payload = {
             'text': prompt,
         }

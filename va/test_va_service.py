@@ -65,7 +65,7 @@ if __name__ == '__main__':
     num_requests = 1
     csv_path = f'../data/testcase.csv'
     # csv_path = f'../data/release_public_set.csv'
-    data_root = '..'
+    data_root = ''
     output_root = '../test_output'
     db = pd.read_csv(csv_path)
     ob = db.iloc[0,:]
