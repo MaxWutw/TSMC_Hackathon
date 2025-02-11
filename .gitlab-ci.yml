@@ -38,7 +38,7 @@ build-docker-image:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
     - docker --version
   script:
-    - docker build --build-arg TARGET_NAME=visionassistant -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=visionassistant -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:$IMAGE_VERSION .
     - docker build --build-arg TARGET_NAME=functioncalling -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:$IMAGE_VERSION .
 
 push-to-registry:
