@@ -23,7 +23,6 @@ install-dependencies:
   stage: install
   script:
     - echo "install dependencies"
-    - apt update && apt install -y jq
 
 testing:
   stage: test
@@ -46,13 +45,14 @@ push-to-registry:
   stage: publish
   image: google/cloud-sdk:latest
   before_script:
-    - apt update && apt install -y jq
+    - apt update && apt install -y jq docker.io
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
     - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
   script:
     - echo "$IMAGE_VERSION"
+    - docker images
     - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:${IMAGE_VERSION}
     - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:${IMAGE_VERSION}
 
