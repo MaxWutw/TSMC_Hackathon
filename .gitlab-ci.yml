@@ -29,7 +29,8 @@ stages:
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
     - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
-    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+    # - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+    - export IMAGE_VERSION=$(echo "latest")
 
 install-dependencies:
   stage: install
@@ -52,23 +53,36 @@ build-and-push-docker-image:
     - docker build --build-arg TARGET_NAME=functioncalling -t $FUNCTION_IMAGE:$IMAGE_VERSION .
     - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
 
-push-to-registry:
-  stage: publish
-  image: google/cloud-sdk:latest
-  before_script:
-    - apt update && apt install -y jq docker.io
-    - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
-    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-    - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
-    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
-  script:
-    - echo "$IMAGE_VERSION"
-    - docker load < vision.tar
-    - docker load < function.tar
-    - docker push $VISION_IMAGE:$IMAGE_VERSION
-    - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
+# push-to-registry:
+#   stage: publish
+#   image: google/cloud-sdk:latest
+#   <<: *auth
+#   script:
+#     - echo "$IMAGE_VERSION"
+#     - docker load < vision.tar
+#     - docker load < function.tar
+#     - docker push $VISION_IMAGE:$IMAGE_VERSION
+#     - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
  
 deploy-to-gcp:
   stage: deploy
   image: google/cloud.sdk:latest
-
+  before_script:
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - gcloud config set project $GCP_PROJECT_ID
+    - gcloud container clusters get-credentials your-cluster-name --zone your-zone --project $GCP_PROJECT_ID
+  script:
+    # - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+    - export IMAGE_VERSION=$(echo "latest")
+    # Apply Kubernetes configurations
+    - kubectl apply -f kubernetes/
+    # Update deployments with new image versions
+    - kubectl set image deployment/vision-assistant-deployment vision-assistant=$VISION_IMAGE:$IMAGE_VERSION
+    - kubectl set image deployment/function-calling-deployment function-calling=$FUNCTION_IMAGE:$IMAGE_VERSION
+    # Verify deployments
+    - kubectl rollout status deployment/vision-assistant-deployment
+    - kubectl rollout status deployment/function-calling-deployment
+    # Output service information
+    - echo "Checking service endpoints..."
+    - kubectl get services
