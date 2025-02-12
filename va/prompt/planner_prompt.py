@@ -16,6 +16,7 @@ Most of the tasks are based on the following directions.
 if you need any other functions or package to done the task, make sure that your environment is working for the method you are using.
 If no, make sure do not use the method you are using and you should try to accomplish the mission again.
 
+It is important that if the task requires you return a IMAGE, make sure return it as a base64 string.
 
 **Example Planning**: Here are some examples of how you can search for a plan, in the examples the user output is denoted by USER, your output is denoted by AGENT and the observations after your code execution are denoted by OBSERVATION:
 {examples}
