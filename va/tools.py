@@ -176,7 +176,7 @@ class FUNCTIONS:
 
         Example:
         -------
-            >>> call_inpainting_image_generate("help me generate a dog sitting on the sofa")
+            >>> call_text_to_image_generate("help me generate a dog sitting on the sofa")
             {'base64': 'a dog sitting on the sofa base64 encoded value'}
         """
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/imagen"
