@@ -9,6 +9,9 @@ variables:
   GCP_PROJECT_ID: tsmccareerhack2025-aaid-grp2
   GCP_REGISTRY_LOCATION: us-central1
   GCP_REGISTRY_NAME: tsmccareerhack2025-aaid-grp2-repository
+  # docker image
+  VISION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver
+  FUNCTION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver
 
 services:
   - docker:dind
@@ -38,8 +41,14 @@ build-docker-image:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
   script:
     - echo "$IMAGE_VERSION"
-    - docker build --build-arg TARGET_NAME=visionassistant -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:$IMAGE_VERSION .
-    - docker build --build-arg TARGET_NAME=functioncalling -t ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=visionassistant -t $VISION_IMAGE:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=functioncalling -t $FUNCTION_IMAGE:$IMAGE_VERSION .
+    - docker save $VISION_IMAGE:$IMAGE_VERSION > vision.tar
+    - docker save $FUNCTION_IMAGE:$IMAGE_VERSION > function.tar
+  artifacts:
+    paths:
+      - vision.tar
+      - fucntion.tar
 
 push-to-registry:
   stage: publish
@@ -52,8 +61,8 @@ push-to-registry:
     - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
   script:
     - echo "$IMAGE_VERSION"
-    - docker images
-    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:${IMAGE_VERSION}
-    - docker push ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:${IMAGE_VERSION}
-
+    - docker load < vision.tar
+    - docker load < function.tar
+    - docker push $VISION_IMAGE:$IMAGE_VERSION
+    - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
 
