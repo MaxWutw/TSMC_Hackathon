@@ -198,3 +198,66 @@ class FUNCTIONS:
            print("Failed to connect to the server")
 
         return gen_image
+    def call_segment_anything_model():
+        """'call_vit_sam' is a tool that helps you generate high-quality object segmentation masks from an input image.
+        You can specify object locations using 2D points, bounding boxes, or let the model automatically generate masks.
+        The tool interacts with a SAM API server to perform segmentation and returns a base64-encoded image with blended masks.
+
+        When using it, you only need to provide the base64-encoded image. 
+        The model processes the image and returns segmentation masks, which are blended with the original image.
+        The return value is a JSON object containing a single field: the base64-encoded string of the modified image.
+        You can retrieve this string using return_image.json()['base64'].
+
+        Parameters:
+            image_base64 (str): The base64-encoded image to segment.
+
+        Returns:
+            Base64 encoding: A method of representing binary data using 64 printable characters.
+            The returned data will be in the format: {'base64': 'encoded data'}.
+
+        Example:
+        -------
+            >>> call_vit_sam(image_base64)
+            {'base64': 'segmented image base64 encoded value'}
+        """
+
+        url = "http://127.0.0.1:8002/sam"
+        payload = {"img_base64": image_base64}
+
+        headers = {'Content-Type': 'application/json'}
+
+        tic = time.time()
+        response = requests.post(url, json=payload, headers=headers)
+        toc = time.time()
+
+        print(f"SAM API response time: {round(toc - tic, 3)} s")
+
+        if response.status_code == 200:
+            response_json = response.json()
+            masks_base64 = response_json.get("masks", [])
+
+            if not masks_base64:
+                print("No masks returned from the server.")
+                exit()
+
+            print(f"Received {len(masks_base64)} masks")
+
+            img_np = np.array(raw_image)
+
+            for mask_base64 in masks_base64:
+                mask_data = base64.b64decode(mask_base64)
+                mask_image = Image.open(io.BytesIO(mask_data)).convert("L") 
+                mask_np = np.array(mask_image)
+
+                img_np[mask_np > 128, 0] = 255  
+
+            output_image = Image.fromarray(img_np)
+            output_image.save("output.png")
+            print("Saved blended image as output.png")
+        else:
+            print(f"Failed to connect to the server, status code: {response.status_code}")
+            print("Response:", response.text)
+
+        gen_image = convert_image_to_base64(output_image)
+
+        return gen_image
