@@ -12,6 +12,9 @@ variables:
   # docker image
   VISION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver
   FUNCTION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver
+  # test variables
+  PYTHONPATH: ${CI_PROJECT_DIR}
+  TEST_REQUIREMENTS: requirements-test.txt
 
 services:
   - docker:dind
@@ -34,13 +37,41 @@ stages:
 
 install-dependencies:
   stage: install
+  image: python:3.9
   script:
-    - echo "install dependencies"
+    - pip install -r requirements.txt
+    - if [ -f "$TEST_REQUIREMENTS" ]; then pip install -r $TEST_REQUIREMENTS; fi
+  artifacts:
+    paths:
+      - venv/
+    expire_in: 1 hour
 
 testing:
   stage: test
+  image: python:3.9
+  dependencies:
+    - install-dependencies
+  services:
+    - name: $VISION_IMAGE:latest
+      alias: vision-service
+    - name: $FUNCTION_IMAGE:latest
+      alias: function-service
+  before_script:
+    - pip install pytest requests
+    # Start your services
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
+    - python -m tool/api_service.py &
+    - gunicorn -c va/service/vaGunicornConfig.py service.vaApp:app &
+    # Wait for services to be ready
+    - sleep 10
   script:
-    - echo "testing"
+    - pytest tests/test_inpainting_service.py -v
+    - pytest tests/test_imagen_service.py -v
+    - pytest tests/test_dino_service.py -v
+    - pytest tests/test_va_service.py -v
+  after_script:
+    - pkill -f "python -m service"
+    - pkill -f "gunicorn"
 
 build-and-push-docker-image:
   stage: build
