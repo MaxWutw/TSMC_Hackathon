@@ -27,3 +27,4 @@ COPY tool/ /workspace/tool/
 WORKDIR /workspace/tool
 RUN mkdir -p grounding-dino-base
 CMD ["python3", "api_service.py"]
+

@@ -1,5 +1,6 @@
 # ip
-IP = "127.0.0.1"
+# IP = "127.0.0.1"
+IP = "0.0.0.0"
 
 # ports
 VISIONASSISTANT_PORT = 8001
