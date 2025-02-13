@@ -3,12 +3,14 @@ import requests
 import time
 from utils import convert_image_to_base64, convert_base64_to_image
 from PIL import Image
+import os
 
 BASE_URL = "http://127.0.0.1:8002"
 
 @pytest.fixture
 def test_image():
-    image_path = "./ref.png"
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.join(current_dir, "ref.png")
     image = Image.open(image_path)
     return convert_image_to_base64(image)
 
