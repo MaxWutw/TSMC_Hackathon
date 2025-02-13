@@ -59,20 +59,27 @@ testing:
   #     alias: function-service
   before_script:
     # - apt-get update && apt-get install -y python3-pip
-    - pip install pytest requests
+    - pip install pytest requests gunicorn
 
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
-    - python -m tool/api_service.py &
-    - gunicorn -c va/service/vaGunicornConfig.py service.vaApp:app &
+    - ls -la
+    - ls -la tool/
+    - ls -la va/
+    - cd tool/
+    - python -m api_service.py &
+    - cd ../
+    - cd va/
+    - gunicorn -c service/vaGunicornConfig.py service.vaApp:app &
+    - cd ../
 
     - sleep 10
   script:
     - pytest tests/test_inpainting_service.py -v
     - pytest tests/test_imagen_service.py -v
     - pytest tests/test_va_service.py -v
-  after_script:
+  # after_script:
     # - pkill -f "python -m service"
-    - pkill -f "gunicorn"
+    # - pkill -f "gunicorn"
 
 build-and-push-docker-image:
   stage: build
