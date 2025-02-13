@@ -49,14 +49,16 @@ install-dependencies:
 testing:
   stage: test
   image: python:3.9
+  <<: *auth
   dependencies:
     - install-dependencies
-  services:
-    - name: $VISION_IMAGE:latest
-      alias: vision-service
-    - name: $FUNCTION_IMAGE:latest
-      alias: function-service
+  # services:
+  #   - name: $VISION_IMAGE:latest
+  #     alias: vision-service
+  #   - name: $FUNCTION_IMAGE:latest
+  #     alias: function-service
   before_script:
+    <<: *auth
     - pip install pytest requests
     # Start your services
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
