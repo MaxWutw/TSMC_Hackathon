@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: functioncalling-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: functioncalling-service
+  template:
+    metadata:
+      labels:
+        app: functioncalling-service
+    spec:
+      containers:
+      - name: functioncalling-service
+        image: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver:latest
+        ports: 
+        - containerPort: 8002
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "12Gi"
+            cpu: "1500m"
+        volumeMounts:
+        - name: grounding-dino-volume
+          mountPath: /workspace/tool/grounding-dino-base
+      volumes:
+      - name: grounding-dino-volume
+        hostPath:
+          path: tool/grounding-dino-base
+          type: Directory
+        # persistentVolumeClaim:
+        #   claimName: dataset-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: functioncalling-service
+spec:
+  type: NodePort
+  selector:
+    app: functioncalling-service
+  ports:
+  - port: 8002
+    targetPort: 8002
+    nodePort: 8002
+  type: ClusterIP
+
+

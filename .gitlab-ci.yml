@@ -12,6 +12,9 @@ variables:
   # docker image
   VISION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver
   FUNCTION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver
+  # test variables
+  PYTHONPATH: ${CI_PROJECT_DIR}
+  TEST_REQUIREMENTS: requirements-test.txt
 
 services:
   - docker:dind
@@ -20,50 +23,107 @@ stages:
   - install
   - test
   - build
-  - publish
+  - deploy
 
-install-dependencies:
-  stage: install
-  script:
-    - echo "install dependencies"
-    - apt update && apt install -y jq
-
-testing:
-  stage: test
-  script:
-    - echo "testing"
-
-build-docker-image:
-  stage: build
-  image: docker:latest
+.auth: &auth
   before_script:
     - apk update && apk add jq
     - docker --version
-    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
-  script:
-    - echo "$IMAGE_VERSION"
-    - docker build --build-arg TARGET_NAME=visionassistant -t $VISION_IMAGE:$IMAGE_VERSION .
-    - docker build --build-arg TARGET_NAME=functioncalling -t $FUNCTION_IMAGE:$IMAGE_VERSION .
-    - docker save $VISION_IMAGE:$IMAGE_VERSION > vision.tar
-    - docker save $FUNCTION_IMAGE:$IMAGE_VERSION > function.tar
-  artifacts:
-    paths:
-      - vision.tar
-      - fucntion.tar
-
-push-to-registry:
-  stage: publish
-  image: google/cloud-sdk:latest
-  before_script:
-    - apt update && apt install -y jq
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
     - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
-    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+    # - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+    - export IMAGE_VERSION=$(echo "latest")
+
+install-dependencies:
+  stage: install
+  image: python:3.9
+  script:
+    # - pip install -r requirements-test.txt
+    # - if [ -f "$TEST_REQUIREMENTS" ]; then pip install -r $TEST_REQUIREMENTS; fi
+    - echo "install dependencies"
+  artifacts:
+    paths:
+      - venv/
+    expire_in: 1 hour
+
+testing:
+  stage: test
+  image: python:3.9
+  <<: *auth
+  dependencies:
+    - install-dependencies
+  # services:
+  #   - name: $VISION_IMAGE:latest
+  #     alias: vision-service
+  #   - name: $FUNCTION_IMAGE:latest
+  #     alias: function-service
+  before_script:
+    # - apt-get update && apt-get install -y python3-pip
+    - pip install -r requirements-test.txt
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
+    - ls -la
+    - ls -la tool/
+    - ls -la va/
+    - cd tool/
+    - python -m api_service.py &
+    - cd ../
+    - cd va/
+    - gunicorn -c service/vaGunicornConfig.py service.vaApp:app &
+    - cd ../
+
+    - sleep 10
+    - ps aux | grep python
+    - netstat -tlpn || echo "netstat not available"
+  script:
+    - pytest tests/test_inpainting_service.py -v
+    - pytest tests/test_imagen_service.py -v
+    - pytest tests/test_va_service.py -v
+  # after_script:
+    # - pkill -f "python -m service"
+    # - pkill -f "gunicorn"
+
+build-and-push-docker-image:
+  stage: build
+  image: google/cloud-sdk:latest
+  <<: *auth
   script:
     - echo "$IMAGE_VERSION"
-    - docker load < vision.tar
-    - docker load < function.tar
+    - docker build --build-arg TARGET_NAME=visionassistant -t $VISION_IMAGE:$IMAGE_VERSION .
     - docker push $VISION_IMAGE:$IMAGE_VERSION
+    - docker build --build-arg TARGET_NAME=functioncalling -t $FUNCTION_IMAGE:$IMAGE_VERSION .
     - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
 
+# push-to-registry:
+#   stage: publish
+#   image: google/cloud-sdk:latest
+#   <<: *auth
+#   script:
+#     - echo "$IMAGE_VERSION"
+#     - docker load < vision.tar
+#     - docker load < function.tar
+#     - docker push $VISION_IMAGE:$IMAGE_VERSION
+#     - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
+ 
+# deploy-to-gcp:
+#   stage: deploy
+#   image: google/cloud.sdk:latest
+#   before_script:
+#     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+#     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+#     - gcloud config set project $GCP_PROJECT_ID
+#     - gcloud container clusters get-credentials your-cluster-name --zone your-zone --project $GCP_PROJECT_ID
+#   script:
+#     # - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+#     - export IMAGE_VERSION=$(echo "latest")
+#     # Apply Kubernetes configurations
+#     - kubectl apply -f kubernetes/
+#     # Update deployments with new image versions
+#     - kubectl set image deployment/vision-assistant-deployment vision-assistant=$VISION_IMAGE:$IMAGE_VERSION
+#     - kubectl set image deployment/function-calling-deployment function-calling=$FUNCTION_IMAGE:$IMAGE_VERSION
+#     # Verify deployments
+#     - kubectl rollout status deployment/vision-assistant-deployment
+#     - kubectl rollout status deployment/function-calling-deployment
+#     # Output service information
+#     - echo "Checking service endpoints..."
+#     - kubectl get services

@@ -3,6 +3,8 @@ FROM python:3.9-slim AS visionassistant
 
 EXPOSE 8001
 WORKDIR /app
+COPY config.py .
+RUN mkdir -p data
 COPY va/requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --no-cache-dir -r requirements.txt
@@ -25,3 +27,4 @@ COPY tool/ /workspace/tool/
 WORKDIR /workspace/tool
 RUN mkdir -p grounding-dino-base
 CMD ["python3", "api_service.py"]
+
