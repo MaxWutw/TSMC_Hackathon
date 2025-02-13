@@ -13,6 +13,8 @@ from utils import convert_base64_to_image, get_base64, get_file_b64str
 import os
 import importlib.util
 import base64
+import io
+from google.cloud import vision
 
 app = Flask(__name__)
 @app.route('/imagen', methods=['POST'])
@@ -103,6 +105,33 @@ def dino_predict():
 @app.route('/api', methods=['GET'])
 def check():
     return jsonify(message="Imagen is running!")
+
+@app.route('/cloudVisionObjectDetection', methods=['POST'])
+def cloud_vision_object_detection():
+    input_data = request.get_json()
+    uri = input_data['uri']
+
+    client = vision.ImageAnnotatorClient()
+    image = vision.Image()
+    image.source.image_uri = uri
+
+    objects = client.object_localization(image=image).localized_object_annotations
+    print(f"Number of objects found: {len(objects)}")
+    object_list = []
+    for object_ in objects:
+        obj_info = {
+            "name": object_.name,
+            "confidence": object_.score,
+            "vertices": [{"x": vertex.x, "y": vertex.y} for vertex in object_.bounding_poly.normalized_vertices]
+        }
+        object_list.append(obj_info)
+        print(f"\n{object_.name} (confidence: {object_.score})")
+        print("Normalized bounding polygon vertices: ")
+        for vertex in object_.bounding_poly.normalized_vertices:
+            print(f" - ({vertex.x}, {vertex.y})")
+
+    return jsonify({"objects": object_list})
+    
 
 if __name__ == '__main__':
 

@@ -198,3 +198,44 @@ class FUNCTIONS:
            print("Failed to connect to the server")
 
         return gen_image
+    
+    def  call_cloud_vision_object_detect(image):
+        """
+        'call_cloud_vision_object_detect' is a tool that helps you detect objects in an image.
+        You can use this tool to identify objects in an image and get a list of detected objects with their bounding boxes.
+        The return value is a JSON object containing a list of detected objects, each with a label, score, and bounding box.
+
+        Parameters:
+            image (PIL.Image): The image to detect objects in.
+
+        Returns:
+            List[Dict]: A list of detected objects, each represented as a dictionary with the keys 'label', 'score', and 'bounding_box'.
+            The 'label' key contains the name of the detected object, the 'score' key contains the confidence score of the detection,
+            and the 'bounding_box' key contains the coordinates of the bounding box as a list [xmin, ymin, xmax, ymax].
+
+        Example:
+        -------
+            >>> call_cloud_vision_object_detect(image)
+            [{'label': 'cat', 'score': 0.95, 'bounding_box': [1353, 183, 1932., 736]}, 
+            {'label': 'dog', 'score': 0.90, 'bounding_box': [296, 64, 1147, 663]}]
+        """
+        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/cloud_vision_object_detect"
+        
+        url = "http://127.0.0.1:8002/cloudVisionObjectDetection"
+
+        payload = {
+            'img_base64': convert_image_to_base64(image)
+        }
+        headers = {'Content-Type': 'application/json'}
+        tic = time.time()
+        response = requests.post(url, json=payload, headers=headers)
+        toc = time.time()
+        print(f"Inpainting spend: {round(toc - tic, 3)} s")
+        if response.status_code == 200:
+           # print("Response from server:", response.json())
+           gen_image = response.json()['base64']
+        else:
+           print("Failed to connect to the server")
+
+        return gen_image
+    
