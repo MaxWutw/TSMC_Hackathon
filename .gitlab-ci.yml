@@ -95,25 +95,25 @@ build-and-push-docker-image:
 #     - docker push $VISION_IMAGE:$IMAGE_VERSION
 #     - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
  
-      # deploy-to-gcp:
-      #   stage: deploy
-      #   image: google/cloud.sdk:latest
-      #   before_script:
-      #     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
-      #     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-      #     - gcloud config set project $GCP_PROJECT_ID
-      #     - gcloud container clusters get-credentials your-cluster-name --zone your-zone --project $GCP_PROJECT_ID
-      #   script:
-      #     # - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
-      #     - export IMAGE_VERSION=$(echo "latest")
-      #     # Apply Kubernetes configurations
-      #     - kubectl apply -f kubernetes/
-      #     # Update deployments with new image versions
-      #     - kubectl set image deployment/vision-assistant-deployment vision-assistant=$VISION_IMAGE:$IMAGE_VERSION
-      #     - kubectl set image deployment/function-calling-deployment function-calling=$FUNCTION_IMAGE:$IMAGE_VERSION
-      #     # Verify deployments
-      #     - kubectl rollout status deployment/vision-assistant-deployment
-      #     - kubectl rollout status deployment/function-calling-deployment
-      #     # Output service information
-      #     - echo "Checking service endpoints..."
-      #     - kubectl get services
+# deploy-to-gcp:
+#   stage: deploy
+#   image: google/cloud.sdk:latest
+#   before_script:
+#     - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+#     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+#     - gcloud config set project $GCP_PROJECT_ID
+#     - gcloud container clusters get-credentials your-cluster-name --zone your-zone --project $GCP_PROJECT_ID
+#   script:
+#     # - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+#     - export IMAGE_VERSION=$(echo "latest")
+#     # Apply Kubernetes configurations
+#     - kubectl apply -f kubernetes/
+#     # Update deployments with new image versions
+#     - kubectl set image deployment/vision-assistant-deployment vision-assistant=$VISION_IMAGE:$IMAGE_VERSION
+#     - kubectl set image deployment/function-calling-deployment function-calling=$FUNCTION_IMAGE:$IMAGE_VERSION
+#     # Verify deployments
+#     - kubectl rollout status deployment/vision-assistant-deployment
+#     - kubectl rollout status deployment/function-calling-deployment
+#     # Output service information
+#     - echo "Checking service endpoints..."
+#     - kubectl get services
