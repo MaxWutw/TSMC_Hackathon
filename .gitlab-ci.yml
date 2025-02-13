@@ -73,7 +73,7 @@ testing:
     - pytest tests/test_dino_service.py -v
     - pytest tests/test_va_service.py -v
   after_script:
-    - pkill -f "python -m service"
+    # - pkill -f "python -m service"
     - pkill -f "gunicorn"
 
 build-and-push-docker-image:
