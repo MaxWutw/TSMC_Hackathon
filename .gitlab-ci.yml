@@ -39,7 +39,7 @@ install-dependencies:
   stage: install
   image: python:3.9
   script:
-    - pip install -r requirements.txt
+    - pip install -r requirements-test.txt
     - if [ -f "$TEST_REQUIREMENTS" ]; then pip install -r $TEST_REQUIREMENTS; fi
   artifacts:
     paths:
