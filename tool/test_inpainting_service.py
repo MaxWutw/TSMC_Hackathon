@@ -1,4 +1,3 @@
-#%%
 from utils import convert_image_to_base64, convert_base64_to_image
 from PIL import Image
 import requests
