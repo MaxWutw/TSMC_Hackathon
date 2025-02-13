@@ -5,3 +5,4 @@ matplotlib
 numpy==1.26.4
 pyarrow
 google-cloud-vision
+google-cloud-aiplatform

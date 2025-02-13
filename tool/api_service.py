@@ -109,26 +109,29 @@ def check():
 @app.route('/cloudVisionObjectDetection', methods=['POST'])
 def cloud_vision_object_detection():
     input_data = request.get_json()
-    uri = input_data['uri']
+    raw_image = input_data['img_base64']
+
+    image = convert_base64_to_image(raw_image)
+    image.save("tmp_cloud_vision.png")
 
     client = vision.ImageAnnotatorClient()
-    image = vision.Image()
-    image.source.image_uri = uri
+    with io.open("tmp_cloud_vision.png", "rb") as image_file:
+        content = image_file.read()
+    image = vision.Image(content=content)
 
-    objects = client.object_localization(image=image).localized_object_annotations
-    print(f"Number of objects found: {len(objects)}")
+    response = client.object_localization(image=image)
+    objects = response.localized_object_annotations
+
     object_list = []
-    for object_ in objects:
-        obj_info = {
-            "name": object_.name,
-            "confidence": object_.score,
-            "vertices": [{"x": vertex.x, "y": vertex.y} for vertex in object_.bounding_poly.normalized_vertices]
+    for obj in objects:
+        object_info = {
+            "name": obj.name,
+            "score": obj.score,
+            "bounding_poly": [
+                {"x": vertex.x, "y": vertex.y} for vertex in obj.bounding_poly.normalized_vertices
+            ]
         }
-        object_list.append(obj_info)
-        print(f"\n{object_.name} (confidence: {object_.score})")
-        print("Normalized bounding polygon vertices: ")
-        for vertex in object_.bounding_poly.normalized_vertices:
-            print(f" - ({vertex.x}, {vertex.y})")
+        object_list.append(object_info)
 
     return jsonify({"objects": object_list})
     
