@@ -73,6 +73,8 @@ testing:
     - cd ../
 
     - sleep 10
+    - ps aux | grep python
+    - netstat -tlpn || echo "netstat not available"
   script:
     - pytest tests/test_inpainting_service.py -v
     - pytest tests/test_imagen_service.py -v
