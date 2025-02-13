@@ -39,8 +39,9 @@ install-dependencies:
   stage: install
   image: python:3.9
   script:
-    - pip install -r requirements-test.txt
-    - if [ -f "$TEST_REQUIREMENTS" ]; then pip install -r $TEST_REQUIREMENTS; fi
+    # - pip install -r requirements-test.txt
+    # - if [ -f "$TEST_REQUIREMENTS" ]; then pip install -r $TEST_REQUIREMENTS; fi
+    - echo "install dependencies"
   artifacts:
     paths:
       - venv/
@@ -59,8 +60,7 @@ testing:
   #     alias: function-service
   before_script:
     # - apt-get update && apt-get install -y python3-pip
-    - pip install pytest requests gunicorn
-
+    - pip install -r requirements-test.txt
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
     - ls -la
     - ls -la tool/
