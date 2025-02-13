@@ -58,7 +58,7 @@ testing:
   #   - name: $FUNCTION_IMAGE:latest
   #     alias: function-service
   before_script:
-    <<: *auth
+    - *auth
     - pip install pytest requests
     # Start your services
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
