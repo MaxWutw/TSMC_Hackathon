@@ -7,7 +7,12 @@ import numpy as np
 import random
 from flask import Flask, jsonify, request
 from utils import convert_base64_to_image
+import importlib.util
+import os
+import base64
 
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = "cpu"
 device = torch.device("cpu")
 print(f"Your device is: {device}")
 processor_dino = AutoProcessor.from_pretrained("grounding-dino-base")
@@ -37,7 +42,11 @@ def predict():
 
 @app.route('/api', methods=['GET'])
 def hello_world():
-    return jsonify(message="Hello, World!")
+    return jsonify(message="Grounding Dino is running!")
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=8001, threaded=False)
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config.py"))
+    spec = importlib.util.spec_from_file_location("config", config_path)
+    config = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(config)
+    app.run(host=config.IP, port=config.DINO_PORT, threaded=False)

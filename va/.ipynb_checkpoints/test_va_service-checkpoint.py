@@ -29,8 +29,13 @@ def send_request(payload):
     print(response)
     if response.status_code == 200:
         # print("Response from server:", response.json())
-        image = response.json()['result']
-        convert_base64_to_image(image).save('output.png')
+        result = response.json()['result']
+        if isinstance(result, Image.Image):
+            print(f"The result is an image: inpainting_image.png")
+            convert_base64_to_image(result).save('inpainting_image.png')
+        elif isinstance(result, (int, float)):
+            result = float(result)
+            print(f"The result is a number: {result}")
     else:
         print("Failed to connect to the server")
 

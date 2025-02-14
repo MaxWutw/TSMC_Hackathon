@@ -52,13 +52,13 @@ class LLM():
         response = model.generate_content(user_message_str, generation_config={"temperature": temperature})
         
         # debug
-        print('\n\n\n')
-        print('LLM Response:')
-        print('-----------------------')
-        print(response)
-        print(response.text)
-        print('-----------------------')
-        print('\n\n\n')
+        # print('\n\n\n')
+        # print('LLM Response:')
+        # print('-----------------------')
+        # print(response)
+        # print(response.text)
+        # print('-----------------------')
+        # print('\n\n\n')
         
         returned_dict = dict()
         returned_dict["choices"] = [dict()]

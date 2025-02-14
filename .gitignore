@@ -1,6 +1,9 @@
-*.json
+tsmccareerhack2025.json
 /data/
 /output/
 /tool/grounding-dino-base/
 /tool/__pycache__/
 /tool/*.png
+/va/*.png
+__pycache__/
+/tool/output_img/

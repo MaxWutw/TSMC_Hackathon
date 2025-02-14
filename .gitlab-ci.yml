@@ -1,0 +1,69 @@
+image: $DOCKER_REGISTRY:latest
+
+variables:
+  DOCKER_REGISTRY: registry.gitlab.com/maxwutw/tsmc_hackathon
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  # GCP variables
+  GCP_PROJECT_ID: tsmccareerhack2025-aaid-grp2
+  GCP_REGISTRY_LOCATION: us-central1
+  GCP_REGISTRY_NAME: tsmccareerhack2025-aaid-grp2-repository
+  # docker image
+  VISION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver
+  FUNCTION_IMAGE: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/functioncallingserver
+
+services:
+  - docker:dind
+
+stages:
+  - install
+  - test
+  - build
+  - publish
+
+install-dependencies:
+  stage: install
+  script:
+    - echo "install dependencies"
+    - apt update && apt install -y jq
+
+testing:
+  stage: test
+  script:
+    - echo "testing"
+
+build-docker-image:
+  stage: build
+  image: docker:latest
+  before_script:
+    - apk update && apk add jq
+    - docker --version
+    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+  script:
+    - echo "$IMAGE_VERSION"
+    - docker build --build-arg TARGET_NAME=visionassistant -t $VISION_IMAGE:$IMAGE_VERSION .
+    - docker build --build-arg TARGET_NAME=functioncalling -t $FUNCTION_IMAGE:$IMAGE_VERSION .
+    - docker save $VISION_IMAGE:$IMAGE_VERSION > vision.tar
+    - docker save $FUNCTION_IMAGE:$IMAGE_VERSION > function.tar
+  artifacts:
+    paths:
+      - vision.tar
+      - fucntion.tar
+
+push-to-registry:
+  stage: publish
+  image: google/cloud-sdk:latest
+  before_script:
+    - apt update && apt install -y jq
+    - echo "$GCP_SERVICE_ACCOUNT_KEY" > /tmp/gcp-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - gcloud auth configure-docker ${GCP_REGISTRY_LOCATION}-docker.pkg.dev --quiet
+    - export IMAGE_VERSION=$(cat info.json | jq -r .version || echo "latest")
+  script:
+    - echo "$IMAGE_VERSION"
+    - docker load < vision.tar
+    - docker load < function.tar
+    - docker push $VISION_IMAGE:$IMAGE_VERSION
+    - docker push $FUNCTION_IMAGE:$IMAGE_VERSION
+
