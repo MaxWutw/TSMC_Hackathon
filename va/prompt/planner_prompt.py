@@ -38,12 +38,8 @@ Make sure that you must manage to accomplish the mission.
 15. Make sure that the answer is ideal and you can try to calculate the answer multiple times to make sure the final answer is right.
 16. If you want to get the answer relative to contour, maybe you can try out opencv or cv2.
 17. If the task requires you return a IMAGE, make sure return it as a base64 string.
-18. If you want to replace the objects with other image, try out call_inpainting_image_generate(prompt , image) function. 
-This function requires you to provide a prompt and an image. The prompt should be a string that describes the object you want to replace, and the image should be a PIL.IMAGE of the image you want to use to replace the object.
-Since the impainting will automatically detect where is the object, you don't need to use grounding dino if you want to replace the object.
-You can just use the impainting function.
-19. If you want to generate a image, try out call_text_to_image_generate(prompt) function.
-20. If you want a precise mask of a object, try out call_segment_anything_model(input_image_base64) function. The parameter format and the return value format are both base64 string. 
+18. Try to use call_cloud_vision_object_detect(prompt, image) first before using call_grounding_dino(prompt, image)
+
 
 The tag must needs:
 <thinking>Your thought process...</thinking>

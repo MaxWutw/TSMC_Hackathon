@@ -32,7 +32,7 @@ class LLM():
     def __init__(self, model_name="gemini-1.5-pro"):
         self.model_name = model_name
 
-    def generate(self, messages, temperature=0):
+    def generate(self, messages, temperature=0.05):
         # wrapping the messages in a dict; doing this separately between system prompt and user prompt
         system_messages = [system_message for system_message in messages if system_message["role"] == "system"]
         user_messages = [user_message for user_message in messages if user_message["role"] == "user"]
@@ -41,6 +41,7 @@ class LLM():
         user_message_str = format_messages(user_messages)
         
         model = GenerativeModel(
+          # model_name="gemini-2.0-flash-001",
           model_name="gemini-1.5-pro-002",
           system_instruction=system_message_str)
         

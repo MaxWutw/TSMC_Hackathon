@@ -15,6 +15,7 @@ import os
 import io
 import importlib.util
 import base64
+import google.cloud.vision_v1 as vision
 from torchvision.ops.boxes import batched_nms
 
 app = Flask(__name__)
@@ -110,6 +111,8 @@ def sam_auto():
     raw_image = convert_base64_to_image(img_base64)
 
     results = generator(raw_image, points_per_batch=256)
+    
+    # img_np = np.array(raw_image)
 
     mask_images_base64 = []
     for mask in results["masks"]:
@@ -119,6 +122,9 @@ def sam_auto():
         mask_image.save(buffer, format="PNG")
         mask_base64 = base64.b64encode(buffer.getvalue()).decode()
         mask_images_base64.append(mask_base64)
+
+    # output_image = Image.fromarray(img_np)
+    # output_image.save("sam_output.png")
 
     return jsonify({"base64": mask_images_base64})
 
@@ -145,6 +151,7 @@ def cloud_vision_object_detection():
             "score": obj.score,
             "bounding_poly": [
                 {"x": vertex.x, "y": vertex.y} for vertex in obj.bounding_poly.normalized_vertices
+                # [vertex.x, vertex.y] for vertex in obj.bounding_poly.normalized_vertices
             ]
         }
         object_list.append(object_info)
@@ -170,8 +177,8 @@ if __name__ == '__main__':
     credential_path = "../va/tsmccareerhack2025.json"
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = "cpu"
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = "cpu"
     print(f"Your device is: {device}")
     processor_dino = AutoProcessor.from_pretrained("grounding-dino-base")
     model_dino = GroundingDinoForObjectDetection.from_pretrained("grounding-dino-base").to(device)

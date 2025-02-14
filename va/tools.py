@@ -1,10 +1,12 @@
 import api
+import base64
 import time
 import requests
 from utils import convert_image_to_base64
 import importlib.util
 import PIL
 import numpy as np
+import io
 
 class FUNCTIONS:
     """ All available functions for the GPT calling """
@@ -127,7 +129,7 @@ class FUNCTIONS:
         When using it, you only need to provide me with the original image and a prompt specifying which part you want to replace. 
         There is no need to provide a mask.
         The return value is a JSON object containing a single field: the base64-encoded string of the modified image. 
-        You can retrieve this string using return_image.json()['base64'].
+        You can retrieve this string using return_image['base64'].
 
         Parameters:
             prompt (str): The prompt to ground to the image.
@@ -160,55 +162,57 @@ class FUNCTIONS:
         else:
            print("Failed to connect to the server")
 
-        return jsonify({"base64": gen_image}) 
+        return {"base64": gen_image}
 
-    def call_text_to_image_generate(prompt):
-        """'call_text_to_image_generate' is a tool that generates an image based on a given prompt.
-        By providing a detailed prompt, you can obtain a result that better matches your expectations.
-        The return value is a JSON object containing a single field: the base64-encoded string of the generated image. 
-        You can retrieve this string using return_image.json()['base64'].
+#     def call_text_to_image_generate(prompt):
+#         """'call_text_to_image_generate' is a tool that generates an image based on a given prompt.
+#         By providing a detailed prompt, you can obtain a result that better matches your expectations.
+#         The return value is a JSON object containing a single field: the base64-encoded string of the generated image. 
+#         You can retrieve this string using return_image['base64'].
 
-        Parameters:
-            prompt (str): The prompt to ground to the image.
+#         Parameters:
+#             prompt (str): The prompt to ground to the image.
 
-        Returns:
-            Base64 encoding: A method of representing binary data using 64 printable characters.
-            The returned data will be in the format: {'base64': 'encoded data'}.
+#         Returns:
+#             Base64 encoding: A method of representing binary data using 64 printable characters.
+#             The returned data will be in the format: {'base64': 'encoded data'}.
 
-        Example:
-        -------
-            >>> call_text_to_image_generate("help me generate a dog sitting on the sofa")
-            {'base64': 'a dog sitting on the sofa base64 encoded value'}
-        """
-        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/imagen"
+#         Example:
+#         -------
+#             >>> call_text_to_image_generate("help me generate a dog sitting on the sofa")
+#             {'base64': 'a dog sitting on the sofa base64 encoded value'}
+#         """
+#         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/imagen"
         
-        url = "http://127.0.0.1:8002/imagen"
-        payload = {
-            'text': prompt,
-        }
+#         url = "http://127.0.0.1:8002/imagen"
+#         payload = {
+#             'text': prompt,
+#         }
 
-        headers = {'Content-Type': 'application/json'}
-        tic = time.time()
-        response = requests.post(url, json=payload, headers=headers)
-        toc = time.time()
-        print(f"Imagen spend: {round(toc - tic, 3)} s")
-        if response.status_code == 200:
-           # print("Response from server:", response.json())
-           gen_image = response.json()['base64']
-        else:
-           print("Failed to connect to the server")
+#         headers = {'Content-Type': 'application/json'}
 
-        return jsonify({"base64": gen_image}) 
+#         tic = time.time()
+#         response = requests.post(url, json=payload, headers=headers)
+#         toc = time.time()
+#         print(f"Imagen spend: {round(toc - tic, 3)} s")
+#         if response.status_code == 200:
+#            # print("Response from server:", response.json())
+#            gen_image = response.json()['base64']
+#         else:
+#            print("Failed to connect to the server")
+
+#         return {"base64": gen_image}
     
     def call_segment_anything_model(image):
         """'call_vit_sam' is a tool that helps you generate high-quality object segmentation masks from an input image.
-        You can specify object locations using 2D points, bounding boxes, or let the model automatically generate masks.
-        The tool interacts with a SAM API server to perform segmentation and returns a base64-encoded image with blended masks.
+        You can let the model automatically generate masks by prividing the original image.
+        The tool interacts with a SAM API server to perform segmentation and returns a base64-encoded image with RED blended masks.
 
         When using it, you only need to provide the original image. There is only one parameter need to pass in.
         The model processes the image and returns segmentation masks, which are blended with the original image.
         The return value is a JSON object containing a single field: the base64-encoded string of the modified image.
-        You can retrieve this string using return_image.json()['base64'].
+        You can retrieve this string using return_image['base64'].
+        Please note that the output sets the masked areas to 255, which means they will appear red.
 
         Parameters:
             image (PIL.Image): The image to ground the prompt to.
@@ -246,17 +250,17 @@ class FUNCTIONS:
 
             print(f"Received {len(masks_base64)} masks")
 
-            img_np = np.array(raw_image)
+            img_np = np.array(image)
 
             for mask_base64 in masks_base64:
                 mask_data = base64.b64decode(mask_base64)
-                mask_image = Image.open(io.BytesIO(mask_data)).convert("L") 
+                mask_image = PIL.Image.open(io.BytesIO(mask_data)).convert("L") 
                 mask_np = np.array(mask_image)
 
-                img_np[mask_np > 128, 0] = 255  
+                img_np[mask_np > 128, 0] = 255
 
-            output_image = Image.fromarray(img_np)
-            # output_image.save("output.png")
+            output_image = PIL.Image.fromarray(img_np)
+            output_image.save("sam_middle_image.png")
             print("Saved blended image as output.png")
         else:
             print(f"Failed to connect to the server, status code: {response.status_code}")
@@ -264,27 +268,29 @@ class FUNCTIONS:
 
         gen_image = convert_image_to_base64(output_image)
 
-        return jsonify({"base64": gen_image}) 
+        return {"base64": gen_image}
 
-    def call_cloud_vision_object_detect(image):
+    def call_cloud_vision_object_detect(prompt, image):
         """
-        'call_cloud_vision_object_detect' is a tool that helps you detect objects in an image.
-        You can use this tool to identify objects in an image and get a list of detected objects with their bounding boxes.
-        The return value is a JSON object containing a list of detected objects, each with a label, score, and bounding box.
+        'call_cloud_vision_object_detect' is a tool that can detect and count multiple objects given a text
+        prompt such as category names or referring expressions. The categories in text prompt
+        are separated by commas or periods. It returns a list of bounding polygons with normalized coordinates.
 
         Parameters:
-            image (PIL.Image): The image to detect objects in.
-
+            prompt (str): The prompt to ground to the image.
+            image (PIL.Image): The image to ground the prompt to.
+        
         Returns:
-            List[Dict]: A list of detected objects, each represented as a dictionary with the keys 'label', 'score', and 'bounding_box'.
-            The 'label' key contains the name of the detected object, the 'score' key contains the confidence score of the detection,
-            and the 'bounding_box' key contains the coordinates of the bounding box as a list [xmin, ymin, xmax, ymax].
+            List[List[List[float]]]: A list containing the bounding polygon of all the detected objects [[[x11, y11], [x12, y12], ...], [[x21, y21], [x22, y22], ...]]
+            
 
         Example:
         -------
-            >>> call_cloud_vision_object_detect(image)
-            [{'label': 'cat', 'score': 0.95, 'bounding_box': [1353, 183, 1932., 736]}, 
-            {'label': 'dog', 'score': 0.90, 'bounding_box': [296, 64, 1147, 663]}]
+            >>> call_cloud_vision_object_detect("cat", image)
+            [
+                [[1353, 183], [1932., 736], [1447., 555]],
+                [[296, 64], [1147, 663]]
+            ]
         """
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/cloud_vision_object_detect"
         
@@ -299,9 +305,21 @@ class FUNCTIONS:
         toc = time.time()
         print(f"Inpainting spend: {round(toc - tic, 3)} s")
         if response.status_code == 200:
-           # print("Response from server:", response.json())
-           gen_image = response.json()['base64']
+            # print("Response from server:", response.json())
+            # gen_image = response.json()['base64']
+            response_json = response.json()
+            detected_objects = response_json.get("objects", [])
+            
+            similar_objects = []
+            
+            for object in detected_objects:
+                print(object['bounding_poly'])
+                similar_objects.append(object['bounding_poly'])
+            
+            return similar_objects
+            
         else:
-           print("Failed to connect to the server")
+            print("Failed to connect to the server")
+            return []
 
-        return gen_image
+#         return similar_objects
