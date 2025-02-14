@@ -80,27 +80,27 @@ def inpainting_predict():
     ret = get_file_b64str(output_file)
     return jsonify({"base64": ret}) 
 
-@app.route('/dino', methods=['POST'])
-def dino_predict():
-
-    input_data = request.get_json()
-    raw_image = input_data['img_base64']
-    raw_image = convert_base64_to_image(raw_image)
-    text = input_data['text']
-    if '.' not in text:
-        text+='.'
-    inputs = processor_dino(images=raw_image, text=text, return_tensors="pt").to(device)
-    outputs = model_dino(**inputs)
-    target_sizes = torch.tensor([raw_image.size[::-1]])
-    results = processor_dino.image_processor.post_process_object_detection(
-        outputs, threshold=0.2, target_sizes=target_sizes
-    )[0]
-    bbox_list = []
-    for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
-        box = [round(i, 1) for i in box.tolist()]
-        bbox_list.append(box)
-        print(f"Detected {label.item()} with confidence " f"{round(score.item(), 2)} at location {box}")
-    return bbox_list
+# @app.route('/dino', methods=['POST'])
+# def dino_predict():
+# 
+#     input_data = request.get_json()
+#     raw_image = input_data['img_base64']
+#     raw_image = convert_base64_to_image(raw_image)
+#     text = input_data['text']
+#     if '.' not in text:
+#         text+='.'
+#     inputs = processor_dino(images=raw_image, text=text, return_tensors="pt").to(device)
+#     outputs = model_dino(**inputs)
+#     target_sizes = torch.tensor([raw_image.size[::-1]])
+#     results = processor_dino.image_processor.post_process_object_detection(
+#         outputs, threshold=0.2, target_sizes=target_sizes
+#     )[0]
+#     bbox_list = []
+#     for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
+#         box = [round(i, 1) for i in box.tolist()]
+#         bbox_list.append(box)
+#         print(f"Detected {label.item()} with confidence " f"{round(score.item(), 2)} at location {box}")
+#     return bbox_list
 
 # @app.route('/sam', methods=['POST'])
 # def sam_auto():
@@ -143,8 +143,8 @@ if __name__ == '__main__':
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     device = "cpu"
     print(f"Your device is: {device}")
-    processor_dino = AutoProcessor.from_pretrained("grounding-dino-base")
-    model_dino = GroundingDinoForObjectDetection.from_pretrained("grounding-dino-base").to(device)
+    # processor_dino = AutoProcessor.from_pretrained("grounding-dino-base")
+    # model_dino = GroundingDinoForObjectDetection.from_pretrained("grounding-dino-base").to(device)
 
 
     # generator = pipeline("mask-generation", model="facebook/sam-vit-large", device=device)
