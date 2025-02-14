@@ -57,8 +57,9 @@ testing:
     - pip install -r requirements-test.txt
     # Start services
     - cd tool/
-    - python3 -m api_service &
-    - python3 -m inpainting_service &
+    - python3 api_service.py &
+    - cd ../va
+    - gunicorn -c service/vaGunicornConfig.py service.vaApp:app &
     - sleep 5
     - cd ..
     # Run tests
