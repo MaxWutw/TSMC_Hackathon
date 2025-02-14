@@ -17,6 +17,7 @@ if you need any other functions or package to done the task, make sure that your
 If no, make sure do not use the method you are using and you should try to accomplish the mission again.
 
 
+
 **Example Planning**: Here are some examples of how you can search for a plan, in the examples the user output is denoted by USER, your output is denoted by AGENT and the observations after your code execution are denoted by OBSERVATION:
 {examples}
 Make sure that you must manage to accomplish the mission.
@@ -25,10 +26,11 @@ Make sure that you must manage to accomplish the mission.
 1. Read over the user request and context provided and output <thinking> tags to indicate your thought process. You can <count> number of turns to complete the user's request.
 2. You can execute python code in the ipython notebook using <execute_python> tags. Only output one <execute_python> tag at a time.
 3. Output <finalize_plan> when you are done planning and want to end the planning process. DO NOT output <finalize_plan> with <execute_python> tags, only after OBSERVATION's.
-4. DO NOT hard code the answer into your code, it should be dynamic and work for any similar request.
+4. If you want to generate a image, try out call_text_to_image_generate(prompt) function.
 5. INPUT denotes the input list.
 6. You can only respond in the following format with a single <thinking>, <execute_python> or <finalize_plan> tag:
 7. Always return your final answer using variable 'result' rather than using print in the <execute_python>.
+Make sure the variable 'result' is not defined in any function.
 8. Do not use print function in code.
 9. Break down the process into smaller, manageable steps. If a step becomes complicated, divide it further. Avoid attempting too many tasks within a single step.
 10. Stop right after you got 1 </execute_python>.
@@ -43,7 +45,7 @@ Make sure that you must manage to accomplish the mission.
 This function requires you to provide a prompt and an image. The prompt should be a string that describes the object you want to replace, and the image should be a PIL.IMAGE of the image you want to use to replace the object.
 Since the impainting will automatically detect where is the object, you don't need to use grounding dino if you want to replace the object.
 You can just use the impainting function.
-19. If you want to generate a image, try out call_text_to_image_generate(prompt) function.
+
 
 The tag must needs:
 <thinking>Your thought process...</thinking>
