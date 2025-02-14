@@ -17,12 +17,16 @@ PLAN = """
 5. INPUT denotes the input list.
 6. You can only respond in the following format with a single <thinking>, <execute_python> or <finalize_plan> tag:
 7. Always return your final answer using variable 'result' rather than using print in the <execute_python>.
-8. Do not use opencv, cv2, print function in code.
+8. Do not use print function in code.
 9. Break down the process into smaller, manageable steps. If a step becomes complicated, divide it further. Avoid attempting too many tasks within a single step.
 10. Stop right after you got 1 </execute_python>.
 11. Do not use placeholder.
 12. Do not install package through pip.
-13. If you get the base64 data, you can return immediately, instead of turn it into PIL.IMAGE.
+14. If you get the base64 data, you can return immediately, instead of turn it into PIL.IMAGE.
+15. You should execute python code with packages that are already installed in the environment.
+16. If your execution result in python has an error, you should manage to fix the error the run the code again.
+17. Make sure that the answer is ideal and you can try to calculate the answer multiple times to make sure the final answer is right.
+18. If you want to get the answer relative to contour, maybe you can try out opencv or cv2.
 
 The tag must needs:
 <thinking>Your thought process...</thinking>

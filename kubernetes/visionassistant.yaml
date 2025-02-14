@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visionassistant-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: visionassistant-service
+  template:
+    metadata:
+      labels:
+        app: visionassistant-service
+    spec:
+      containers:
+      - name: visionassistant-service
+        image: ${GCP_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REGISTRY_NAME}/visionassistantserver:latest
+        ports: 
+        - containerPort: 8001
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "8Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: dataset-volume
+          mountPath: /app/data
+      volumes:
+      - name: dataset-volume
+        hostPath:
+          path: data/
+          type: Directory
+        # persistentVolumeClaim:
+        #   claimName: dataset-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: visionassistant-service
+spec:
+  type: NodePort
+  selector:
+    app: visionassistant-service
+  ports:
+  - port: 8001
+    targetPort: 8001
+    nodePort: 8001
+  type: ClusterIP
+
+

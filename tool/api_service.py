@@ -2,6 +2,7 @@ import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
 from vertexai.preview.vision_models import Image as vertexImage
 from transformers import AutoProcessor, GroundingDinoForObjectDetection
+from transformers import pipeline
 from PIL import Image
 import requests
 import torch
@@ -11,8 +12,10 @@ import random
 from flask import Flask, jsonify, request
 from utils import convert_base64_to_image, get_base64, get_file_b64str
 import os
+import io
 import importlib.util
 import base64
+from torchvision.ops.boxes import batched_nms
 
 app = Flask(__name__)
 @app.route('/imagen', methods=['POST'])
@@ -99,6 +102,25 @@ def dino_predict():
         print(f"Detected {label.item()} with confidence " f"{round(score.item(), 2)} at location {box}")
     return bbox_list
 
+@app.route('/sam', methods=['POST'])
+def sam_auto():
+    input_data = request.get_json()
+    img_base64 = input_data['img_base64']
+
+    raw_image = convert_base64_to_image(img_base64)
+
+    results = generator(raw_image, points_per_batch=256)
+
+    mask_images_base64 = []
+    for mask in results["masks"]:
+        mask_image = Image.fromarray(mask.astype("uint8") * 255)
+
+        buffer = io.BytesIO()
+        mask_image.save(buffer, format="PNG")
+        mask_base64 = base64.b64encode(buffer.getvalue()).decode()
+        mask_images_base64.append(mask_base64)
+
+    return jsonify({"masks": mask_images_base64})
 
 @app.route('/api', methods=['GET'])
 def check():
@@ -124,6 +146,8 @@ if __name__ == '__main__':
     processor_dino = AutoProcessor.from_pretrained("grounding-dino-base")
     model_dino = GroundingDinoForObjectDetection.from_pretrained("grounding-dino-base").to(device)
 
+
+    generator = pipeline("mask-generation", model="facebook/sam-vit-large", device=device)
+
     vertexai.init(project=PROJECT_ID, location="us-central1")
     app.run(host=config.IP, port=config.API_PORT, threaded=False)
-

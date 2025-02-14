@@ -7,3 +7,5 @@ tsmccareerhack2025.json
 /va/*.png
 __pycache__/
 /tool/output_img/
+.ipynb_checkpoints/
+sam-vit-large/
