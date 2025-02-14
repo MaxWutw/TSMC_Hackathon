@@ -48,6 +48,8 @@ install-dependencies:
     expire_in: 1 hour
 
 testing:
+  tags:
+    - project
   stage: test
   image: python:3.9
   script:
