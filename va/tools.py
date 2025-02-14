@@ -159,7 +159,7 @@ class FUNCTIONS:
         else:
            print("Failed to connect to the server")
 
-        return gen_image
+        return jsonify({"base64": gen_image}) 
 
     def call_text_to_image_generate(prompt):
         """'call_text_to_image_generate' is a tool that generates an image based on a given prompt.
@@ -197,32 +197,35 @@ class FUNCTIONS:
         else:
            print("Failed to connect to the server")
 
-        return gen_image
-    def call_segment_anything_model():
+        return jsonify({"base64": gen_image}) 
+    
+    def call_segment_anything_model(image):
         """'call_vit_sam' is a tool that helps you generate high-quality object segmentation masks from an input image.
         You can specify object locations using 2D points, bounding boxes, or let the model automatically generate masks.
         The tool interacts with a SAM API server to perform segmentation and returns a base64-encoded image with blended masks.
 
-        When using it, you only need to provide the base64-encoded image. 
+        When using it, you only need to provide the original image. There is only one parameter need to pass in.
         The model processes the image and returns segmentation masks, which are blended with the original image.
         The return value is a JSON object containing a single field: the base64-encoded string of the modified image.
         You can retrieve this string using return_image.json()['base64'].
 
         Parameters:
-            image_base64 (str): The base64-encoded image to segment.
+            image (PIL.Image): The image to ground the prompt to.
 
         Returns:
             Base64 encoding: A method of representing binary data using 64 printable characters.
             The returned data will be in the format: {'base64': 'encoded data'}.
-
         Example:
         -------
-            >>> call_vit_sam(image_base64)
+            >>> call_segment_anything_model(image)
             {'base64': 'segmented image base64 encoded value'}
         """
 
         url = "http://127.0.0.1:8002/sam"
-        payload = {"img_base64": image_base64}
+        payload = {
+            "img_base64": convert_image_to_base64(image)
+            # "img_base64": image
+        }
 
         headers = {'Content-Type': 'application/json'}
 
@@ -234,7 +237,7 @@ class FUNCTIONS:
 
         if response.status_code == 200:
             response_json = response.json()
-            masks_base64 = response_json.get("masks", [])
+            masks_base64 = response_json.get("base64", [])
 
             if not masks_base64:
                 print("No masks returned from the server.")
@@ -252,12 +255,52 @@ class FUNCTIONS:
                 img_np[mask_np > 128, 0] = 255  
 
             output_image = Image.fromarray(img_np)
-            output_image.save("output.png")
+            # output_image.save("output.png")
             print("Saved blended image as output.png")
         else:
             print(f"Failed to connect to the server, status code: {response.status_code}")
             print("Response:", response.text)
 
         gen_image = convert_image_to_base64(output_image)
+
+        return jsonify({"base64": gen_image}) 
+
+    def call_cloud_vision_object_detect(image):
+        """
+        'call_cloud_vision_object_detect' is a tool that helps you detect objects in an image.
+        You can use this tool to identify objects in an image and get a list of detected objects with their bounding boxes.
+        The return value is a JSON object containing a list of detected objects, each with a label, score, and bounding box.
+
+        Parameters:
+            image (PIL.Image): The image to detect objects in.
+
+        Returns:
+            List[Dict]: A list of detected objects, each represented as a dictionary with the keys 'label', 'score', and 'bounding_box'.
+            The 'label' key contains the name of the detected object, the 'score' key contains the confidence score of the detection,
+            and the 'bounding_box' key contains the coordinates of the bounding box as a list [xmin, ymin, xmax, ymax].
+
+        Example:
+        -------
+            >>> call_cloud_vision_object_detect(image)
+            [{'label': 'cat', 'score': 0.95, 'bounding_box': [1353, 183, 1932., 736]}, 
+            {'label': 'dog', 'score': 0.90, 'bounding_box': [296, 64, 1147, 663]}]
+        """
+        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/cloud_vision_object_detect"
+        
+        url = "http://127.0.0.1:8002/cloudVisionObjectDetection"
+
+        payload = {
+            'img_base64': convert_image_to_base64(image)
+        }
+        headers = {'Content-Type': 'application/json'}
+        tic = time.time()
+        response = requests.post(url, json=payload, headers=headers)
+        toc = time.time()
+        print(f"Inpainting spend: {round(toc - tic, 3)} s")
+        if response.status_code == 200:
+           # print("Response from server:", response.json())
+           gen_image = response.json()['base64']
+        else:
+           print("Failed to connect to the server")
 
         return gen_image

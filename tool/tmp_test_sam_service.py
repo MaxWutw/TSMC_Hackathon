@@ -28,7 +28,7 @@ print(f"SAM API response time: {round(toc - tic, 3)} s")
 
 if response.status_code == 200:
     response_json = response.json()
-    masks_base64 = response_json.get("masks", [])
+    masks_base64 = response_json.get("base64", [])
 
     if not masks_base64:
         print("No masks returned from the server.")

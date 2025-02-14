@@ -5,9 +5,7 @@ from tools import FUNCTIONS
 from colorama import Fore, Style
 from prompt.planner_prompt import (
     PLAN,
-    EXAMPLE_PLAN1,
-    EXAMPLE_PLAN2,
-    KNOWLEGE
+    EXAMPLE_PLAN1
     )
 
 import utils
@@ -44,8 +42,8 @@ class DataManager:
         tool_doc = self.get_tool_doc()
         sys_prompt = PLAN.format(
             tool_desc = tool_doc,
-            examples = f"{EXAMPLE_PLAN1}\n{EXAMPLE_PLAN2}",
-            knowlege = KNOWLEGE
+            examples = f"{EXAMPLE_PLAN1}\n",
+            knowlege = ""
             )
         return sys_prompt
 

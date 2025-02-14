@@ -120,11 +120,41 @@ def sam_auto():
         mask_base64 = base64.b64encode(buffer.getvalue()).decode()
         mask_images_base64.append(mask_base64)
 
-    return jsonify({"masks": mask_images_base64})
+    return jsonify({"base64": mask_images_base64})
+
+@app.route('/cloudVisionObjectDetection', methods=['POST'])
+def cloud_vision_object_detection():
+    input_data = request.get_json()
+    raw_image = input_data['img_base64']
+
+    image = convert_base64_to_image(raw_image)
+    image.save("tmp_cloud_vision.png")
+
+    client = vision.ImageAnnotatorClient()
+    with io.open("tmp_cloud_vision.png", "rb") as image_file:
+        content = image_file.read()
+    image = vision.Image(content=content)
+
+    response = client.object_localization(image=image)
+    objects = response.localized_object_annotations
+
+    object_list = []
+    for obj in objects:
+        object_info = {
+            "name": obj.name,
+            "score": obj.score,
+            "bounding_poly": [
+                {"x": vertex.x, "y": vertex.y} for vertex in obj.bounding_poly.normalized_vertices
+            ]
+        }
+        object_list.append(object_info)
+
+    return jsonify({"objects": object_list})
 
 @app.route('/api', methods=['GET'])
 def check():
     return jsonify(message="Imagen is running!")
+
 
 if __name__ == '__main__':
 

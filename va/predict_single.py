@@ -4,10 +4,11 @@ from agent.vision_assistant_agent import VisionAssistant
 import time
 
 if __name__ == '__main__':
+    # public set
     csv_path = f'../data/release_public_set.csv'
     data_root = '..'
     output_root = '../output'
-
+    
     db = pd.read_csv(csv_path)
     db = DataManager(db, data_root)
     # db = DataManager(db, data_root)
