@@ -9,3 +9,4 @@ __pycache__/
 /tool/output_img/
 .ipynb_checkpoints/
 sam-vit-large/
+/venv/
