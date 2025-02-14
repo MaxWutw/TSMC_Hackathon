@@ -52,7 +52,6 @@ testing:
     - project
   stage: test
   script:
-    - pyenv activate myenv
     - pip install pytest requests pillow
     - pip install -r requirements-test.txt
     # Start services
