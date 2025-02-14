@@ -51,7 +51,6 @@ testing:
   tags:
     - project
   stage: test
-  image: python:3.9
   script:
     - pyenv activate myenv
     - pip install pytest requests pillow
