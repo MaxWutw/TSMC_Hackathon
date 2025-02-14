@@ -70,14 +70,6 @@ def dino_predict():
         box = [round(i, 1) for i in box.tolist()]
         bbox_list.append(box)
         print(f"Detected {label.item()} with confidence " f"{round(score.item(), 2)} at location {box}")
-    img = np.array(raw_image)
-    for bbox in bbox_list:
-        # payload={'image': b64_image}
-        bbox = [int(i) for i in bbox]
-        x1,y1,x2,y2 = bbox
-        img[y1:y2, x1:x2, 2] = 255
-    Image.fromarray(img).save('dino_output_image.png')
-    
     return bbox_list
 
 @app.route('/sam', methods=['POST'])
@@ -127,8 +119,8 @@ def cloud_vision_object_detection():
             "name": obj.name,
             "score": obj.score,
             "bounding_poly": [
-                # {"x": vertex.x, "y": vertex.y} for vertex in obj.bounding_poly.normalized_vertices
-                [vertex.x, vertex.y] for vertex in obj.bounding_poly.normalized_vertices
+                {"x": vertex.x, "y": vertex.y} for vertex in obj.bounding_poly.normalized_vertices
+                # [vertex.x, vertex.y] for vertex in obj.bounding_poly.normalized_vertices
             ]
         }
         object_list.append(object_info)
@@ -164,4 +156,4 @@ if __name__ == '__main__':
     generator = pipeline("mask-generation", model="facebook/sam-vit-large", device=device)
 
     vertexai.init(project=PROJECT_ID, location="us-central1")
-    app.run(host=config.IP, port=config.API_PORT, threaded=False)
+    app.run(host=config.IP, port=8005, threaded=False)

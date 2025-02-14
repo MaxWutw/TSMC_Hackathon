@@ -22,47 +22,6 @@ class FUNCTIONS:
             
     """
 
-    def call_google(query: str, **kwargs):
-        """ 
-        'call_google' returns a summary from searching query on google
-        Parameters:
-            query (str): The search query to be used in the Google search.
-            **kwargs: Additional keyword arguments that can be used for extended functionality
-                  in future implementations, but are currently unused.
-        Returns:
-            str: A response message searched by google.
-        Example
-        -------
-            >>> call_google(European Union)
-            "Sweden decided to join NATO due to a combin..."
-        """
-        mock_info = "Sweden decided to join NATO due to a combination of reasons. These include the desire to strengthen its security in light of recent regional developments, notably Russia's aggressive actions, \
-                    such as its war that has pushed the alliance to expand. Sweden, along with Finland, has been an official partner of NATO since 1994 and has been a major contributor to the alliance, participating in various NATO operations. \
-                    The Swedish government assessed that joining NATO was the best way to protect its national security. Additionally, Sweden's membership was seen as a means to strengthen NATO itself and add to the stability in the Euro-Atlantic area. \
-                    The process of joining NATO was completed after overcoming the last hurdles, including obtaining the necessary approvals from all existing member states, such as Turkey and Hungary."
-        mock_info = 'Cannot find result, you can search on wikipedia.'
-        return mock_info
-
-    def call_wikipedia(query: str):
-        """ 
-        'call_wikipedia' returns a summary from searching query on wiki
-        Parameters:
-            query (str): The search query to be used in the wiki search.
-        Returns:
-            str: A response message searched on wiki.
-        Example
-        -------
-            >>> call_wikipedia(European Union)
-            "Sweden decided to join NATO due to a combin..."
-        """
-        mock_info = "Sweden decided to join NATO due to a combination of reasons. These include the desire to strengthen its security in light of recent regional developments, notably Russia's aggressive actions, \
-                    such as its war that has pushed the alliance to expand. Sweden, along with Finland, has been an official partner of NATO since 1994 and has been a major contributor to the alliance, participating in various NATO operations. \
-                    The Swedish government assessed that joining NATO was the best way to protect its national security. Additionally, Sweden's membership was seen as a means to strengthen NATO itself and add to the stability in the Euro-Atlantic area. \
-                    The process of joining NATO was completed after overcoming the last hurdles, including obtaining the necessary approvals from all existing member states, such as Turkey and Hungary."
-        
-        return mock_info
-
-
     def calculate(expression: str):
         """
         'calculate' is a toolEvaluates a mathematical expression provided as a string and returns the result.
@@ -270,27 +229,35 @@ class FUNCTIONS:
 
         return {"base64": gen_image}
 
-    def call_cloud_vision_object_detect(prompt, image):
+    def call_cloud_vision_object_detect(image):
         """
-        'call_cloud_vision_object_detect' is a tool that can detect and count multiple objects given a text
-        prompt such as category names or referring expressions. The categories in text prompt
-        are separated by commas or periods. It returns a list of bounding polygons with normalized coordinates.
+        'call_cloud_vision_object_detect' is an object detection function that processes an image to identify multiple objects 
+    and returns their bounding polygons along with relevant details.
 
         Parameters:
-            prompt (str): The prompt to ground to the image.
             image (PIL.Image): The image to ground the prompt to.
         
         Returns:
-            List[List[List[float]]]: A list containing the bounding polygon of all the detected objects [[[x11, y11], [x12, y12], ...], [[x21, y21], [x22, y22], ...]]
-            
-
+            List[Dict[str, Any]]: A list of detected objects, where each object contains:
+            - "name" (str): The label of the detected object.
+            - "score" (float): The confidence score of the detection.
+            - "bounding_poly" (List[List[float]]): The normalized bounding polygon of the detected object.
+        
         Example:
-        -------
-            >>> call_cloud_vision_object_detect("cat", image)
-            [
-                [[1353, 183], [1932., 736], [1447., 555]],
-                [[296, 64], [1147, 663]]
-            ]
+        ---------------
+        >>> call_cloud_vision_object_detect(image)
+        [
+            {
+                "name": "Cat",
+                "score": 0.95,
+                "bounding_poly": [[0.23, 0.15], [0.75, 0.45], [0.30, 0.55]]
+            },
+            {
+                "name": "Dog",
+                "score": 0.89,
+                "bounding_poly": [[0.05, 0.10], [0.90, 0.80]]
+            }
+        ]
         """
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/cloud_vision_object_detect"
         
@@ -303,20 +270,20 @@ class FUNCTIONS:
         tic = time.time()
         response = requests.post(url, json=payload, headers=headers)
         toc = time.time()
-        print(f"Inpainting spend: {round(toc - tic, 3)} s")
+        print(f"cloud vision object detect spend: {round(toc - tic, 3)} s")
         if response.status_code == 200:
-            # print("Response from server:", response.json())
+            print("Response from server:", response.json())
             # gen_image = response.json()['base64']
             response_json = response.json()
             detected_objects = response_json.get("objects", [])
             
-            similar_objects = []
+            # similar_objects = []
             
-            for object in detected_objects:
-                print(object['bounding_poly'])
-                similar_objects.append(object['bounding_poly'])
+            # for object in detected_objects:
+            #     print(object['bounding_poly'])
+            #     similar_objects.append(object['bounding_poly'])
             
-            return similar_objects
+            return detected_objects
             
         else:
             print("Failed to connect to the server")

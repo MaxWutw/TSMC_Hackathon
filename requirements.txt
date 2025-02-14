@@ -22,3 +22,4 @@ google-cloud-aiplatform
 gunicorn
 google-generativeai
 gradio==4.44.1
+thefuzz
