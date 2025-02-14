@@ -165,13 +165,14 @@ class FUNCTIONS:
     def call_segment_anything_model(image):
         """'call_vit_sam' is a tool that helps you generate high-quality object segmentation masks from an input image.
         You can let the model automatically generate masks by prividing the original image.
-        The tool interacts with a SAM API server to perform segmentation and returns a base64-encoded image with RED blended masks.
+        The tool interacts with a SAM API server to perform segmentation and returns a base64-encoded image with red blended masks.
 
         When using it, you only need to provide the original image. There is only one parameter need to pass in.
         The model processes the image and returns segmentation masks, which are blended with the original image.
         The return value is a JSON object containing a single field: the base64-encoded string of the modified image.
         You can retrieve this string using return_image['base64'].
         Please note that the output sets the masked areas to 255, which means they will appear red.
+        And it will return it as base64 string to you!
 
         Parameters:
             image (PIL.Image): The image to ground the prompt to.
@@ -215,7 +216,7 @@ class FUNCTIONS:
                 mask_data = base64.b64decode(mask_base64)
                 mask_image = PIL.Image.open(io.BytesIO(mask_data)).convert("L") 
                 mask_np = np.array(mask_image)
-
+                
                 img_np[mask_np > 128, 0] = 255
 
             output_image = PIL.Image.fromarray(img_np)
@@ -231,8 +232,9 @@ class FUNCTIONS:
 
     def call_cloud_vision_object_detect(image):
         """
-        'call_cloud_vision_object_detect' is an object detection function that processes an image to identify multiple objects 
-    and returns their bounding polygons along with relevant details.
+        'call_cloud_vision_object_detect' is an object detection function that processes an image 
+        to identify multiple objects and returns their normalized bounding polygons along with name
+        and score. Since it will return name, you can try to compare the name with the required prompt
 
         Parameters:
             image (PIL.Image): The image to ground the prompt to.
@@ -248,12 +250,12 @@ class FUNCTIONS:
         >>> call_cloud_vision_object_detect(image)
         [
             {
-                "name": "Cat",
+                "name": "White Cat",
                 "score": 0.95,
                 "bounding_poly": [[0.23, 0.15], [0.75, 0.45], [0.30, 0.55]]
             },
             {
-                "name": "Dog",
+                "name": "Black Dog",
                 "score": 0.89,
                 "bounding_poly": [[0.05, 0.10], [0.90, 0.80]]
             }
@@ -273,17 +275,26 @@ class FUNCTIONS:
         print(f"cloud vision object detect spend: {round(toc - tic, 3)} s")
         if response.status_code == 200:
             print("Response from server:", response.json())
-            # gen_image = response.json()['base64']
+
             response_json = response.json()
             detected_objects = response_json.get("objects", [])
             
-            # similar_objects = []
-            
-            # for object in detected_objects:
-            #     print(object['bounding_poly'])
-            #     similar_objects.append(object['bounding_poly'])
-            
             return detected_objects
+            
+            # similar_objects = []
+
+            # for object in detected_objects:
+            #     # print(object['bounding_poly'])
+            #     # similar_objects.append(object['bounding_poly'])
+                
+                # ratio = fuzz.partial_ratio(object['name'], prompt)
+                # print(object['name'] + prompt + ":" + str(ratio))
+                
+                # if ratio >= 70:
+                #     similar_objects.append(object['bounding_poly'])
+            
+            # print(similar_objects)
+            # return similar_objects
             
         else:
             print("Failed to connect to the server")

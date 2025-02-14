@@ -43,7 +43,6 @@ You can just use the impainting function.
 16. Opencv and cv2 is fine to use.
 17. If the task requires you return a IMAGE, make sure return it as a base64 string.
 18. if you want to inpaint an image, you can use call_grounding_dino to pass the bounding box into the prompt for inpainting. Convert the box list into a string and include it in the prompt to specify the area that needs to be modified.
-19. If you want to detect an object, you can use call_cloud_vision_object_detect before using call_grounding_dino to detect all the objects in the image.
 
 The tag must needs:
 <thinking>Your thought process...</thinking>
