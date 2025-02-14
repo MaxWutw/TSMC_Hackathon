@@ -1,0 +1,2 @@
+,id,task,messages,detail,input,output_format,metric,ground_truth
+0,test01,generate,Help me convert the bear in the images into lion.,You can detect the bear in the image and use image generator to generate the lion and replace the bear to lion.Supply the end result as a PIL.Image object.,{'ref': 'ref.png'},"A high-resolution color image of the lion generate image",IOU,./va/defect.png
