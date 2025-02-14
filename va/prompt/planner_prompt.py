@@ -24,8 +24,7 @@ PLAN = """
 15. Make sure that the answer is ideal and you can try to calculate the answer multiple times to make sure the final answer is right.
 16. If you want to get the answer relative to contour, maybe you can try out opencv or cv2.
 17. If the task requires you return a IMAGE, make sure return it as a base64 string.
-18. if you want to inpaint an image, you can use GroundingDINO to pass the bounding box into the prompt for inpainting. Convert the box list into a string and include it in the prompt to specify the area that needs to be modified.
-19. Remember to import all the package you use in the code, such as io, numpy, base64, etc.
+18. if you want to inpaint an image, you can use call_grounding_dino to pass the bounding box into the prompt for inpainting. Convert the box list into a string and include it in the prompt to specify the area that needs to be modified.
 
 The tag must needs:
 <thinking>Your thought process...</thinking>
