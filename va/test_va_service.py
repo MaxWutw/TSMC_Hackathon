@@ -19,18 +19,18 @@ import utils
 
 
 # url = "http://192.168.1.100:8001/vision"
-url = "http://127.0.0.1:8001/vision"
+url = "http://127.0.0.1:8003/vision"
 
 def send_request(payload):
     # with open("test_input.json", "r") as file:
     #     payload = json.load(file)
     headers = {'Content-Type': 'application/json'}
     response = requests.post(url, json=payload, headers=headers)
-    print(response)
+    # print(response)
     if response.status_code == 200:
         # print("Response from server:", response.json())
         image = response.json()['result']
-        convert_base64_to_image(image).save('output.png')
+        convert_base64_to_image(image).save('inpainting_image.png')
     else:
         print("Failed to connect to the server")
 
@@ -43,7 +43,7 @@ def get_payload(ob, data_root):
         "outputType": ob['output_format'],
         "artifacts": []
     }
-    print(payload)
+    # print(payload)
     payload["artifacts"] = get_artifact(ob, data_root)
     return payload
 
@@ -68,8 +68,13 @@ if __name__ == '__main__':
     data_root = ''
     output_root = '../test_output'
     db = pd.read_csv(csv_path)
+    idx = 0
+    # for ob in db:
+    #     send_request(get_payload(ob, data_root))
+        
     ob = db.iloc[0,:]
     send_request(get_payload(ob, data_root))
+
     # with ThreadPoolExecutor(max_workers=num_requests) as executor:
     #     futures = [executor.submit(send_request) for _ in range(num_requests)]
     #     for future in futures:

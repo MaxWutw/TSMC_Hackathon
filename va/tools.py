@@ -4,6 +4,7 @@ import requests
 from utils import convert_image_to_base64
 import importlib.util
 import PIL
+import numpy as np
 
 class FUNCTIONS:
     """ All available functions for the GPT calling """
@@ -100,7 +101,7 @@ class FUNCTIONS:
         """
         # url = "http://192.168.1.100:8001/dino"
         
-        url = "http://127.0.0.1:8002/dino"
+        url = "http://127.0.0.1:8004/dino"
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/dino"
         payload = {
             'text': prompt,
@@ -118,6 +119,7 @@ class FUNCTIONS:
             bboxes = response.json()
         else:
             print("Failed to connect to the server")
+
         return bboxes
 
     def call_inpainting_image_generate(prompt, image):
@@ -129,7 +131,7 @@ class FUNCTIONS:
         You can retrieve this string using return_image.json()['base64'].
 
         Parameters:
-            prompt (str): The prompt to ground to the image.
+            prompt (str): The prompt to ground to the image and the the bounding box of the replace target.
             image (PIL.Image): The image to ground the prompt to.
 
         Returns:
@@ -143,7 +145,7 @@ class FUNCTIONS:
         """
         # url = self.config.IP + ":" + str(self.config.API_PORT) + "/inpainting"
         
-        url = "http://127.0.0.1:8002/inpainting"
+        url = "http://127.0.0.1:8004/inpainting"
         payload = {
             'text': prompt,
             'img_base64': convert_image_to_base64(image)
@@ -159,42 +161,4 @@ class FUNCTIONS:
         else:
            print("Failed to connect to the server")
 
-        return gen_image
-
-    def call_text_to_image_generate(prompt):
-        """'call_text_to_image_generate' is a tool that generates an image based on a given prompt.
-        By providing a detailed prompt, you can obtain a result that better matches your expectations.
-        The return value is a JSON object containing a single field: the base64-encoded string of the generated image. 
-        You can retrieve this string using return_image.json()['base64'].
-
-        Parameters:
-            prompt (str): The prompt to ground to the image.
-
-        Returns:
-            Base64 encoding: A method of representing binary data using 64 printable characters.
-            The returned data will be in the format: {'base64': 'encoded data'}.
-
-        Example:
-        -------
-            >>> call_inpainting_image_generate("help me generate a dog sitting on the sofa")
-            {'base64': 'a dog sitting on the sofa base64 encoded value'}
-        """
-        # url = self.config.IP + ":" + str(self.config.API_PORT) + "/imagen"
-        
-        url = "http://127.0.0.1:8002/imagen"
-        payload = {
-            'text': prompt,
-        }
-
-        headers = {'Content-Type': 'application/json'}
-        tic = time.time()
-        response = requests.post(url, json=payload, headers=headers)
-        toc = time.time()
-        print(f"Imagen spend: {round(toc - tic, 3)} s")
-        if response.status_code == 200:
-           # print("Response from server:", response.json())
-           gen_image = response.json()['base64']
-        else:
-           print("Failed to connect to the server")
-
-        return gen_image
+        return {"base64": gen_image}

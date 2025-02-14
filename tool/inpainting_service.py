@@ -63,5 +63,5 @@ if __name__ == '__main__':
     # prompt = "Please draw me 3 dogs"
 
     vertexai.init(project=PROJECT_ID, location="us-central1")
-    app.run(host=config.IP, port=config.INPAINTING_PORT, threaded=False)
+    app.run(host=config.IP, port=config.API_PORT, threaded=False)
 

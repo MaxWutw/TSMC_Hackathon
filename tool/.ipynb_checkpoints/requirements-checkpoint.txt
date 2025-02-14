@@ -1,0 +1,8 @@
+transformers
+pillow
+torch
+torchvision
+matplotlib
+numpy==1.26.4
+pyarrow
+google-cloud-vision

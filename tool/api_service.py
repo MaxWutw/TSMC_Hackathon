@@ -15,42 +15,11 @@ import importlib.util
 import base64
 
 app = Flask(__name__)
-@app.route('/imagen', methods=['POST'])
-def image_predict():
-    input_data = request.get_json()
-    output_file = "output_img/input-image1.png"
-    text = input_data['text']
-    if '.' not in text:
-        text+='.'
-    model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
-
-    images = model.generate_images(
-        prompt=text,
-        # Optional parameters
-        number_of_images=1,
-        language="en",
-        # You can't use a seed value and watermark at the same time.
-        # add_watermark=False,
-        # seed=100,
-        aspect_ratio="1:1",
-        safety_filter_level="block_some",
-        # person_generation="allow_adult",
-    )
-
-    images[0].save(location=output_file, include_generation_parameters=False)
-
-    # Optional. View the generated image in a notebook.
-    # images[0].show()
-
-    print(f"Created output image using {len(images[0]._image_bytes)} bytes")
-    ret = get_file_b64str(output_file)
-    return jsonify({"base64": ret}) 
-
 @app.route('/inpainting', methods=['POST'])
 def inpainting_predict():
     input_data = request.get_json()
     output_file = "output_img/input-image2.png"
-    print(output_file)
+    # print(output_file)
     raw_image = input_data['img_base64']
     raw_image = convert_base64_to_image(raw_image)
     # with open("tmp_inpainting.png", "wb") as ti:
@@ -61,6 +30,7 @@ def inpainting_predict():
     # text = text + ".Please generate the image base on the below image(which had been turn into base64):" + raw_image
     if '.' not in text:
         text+='.'
+    text += "Make sure to only replace the specified area I provided, and keep the rest of the image unchanged."
     # model = ImageGenerationModel.from_pretrained("imagen-3.0-generate-001")
     model = ImageGenerationModel.from_pretrained("imagegeneration")
 
@@ -97,6 +67,15 @@ def dino_predict():
         box = [round(i, 1) for i in box.tolist()]
         bbox_list.append(box)
         print(f"Detected {label.item()} with confidence " f"{round(score.item(), 2)} at location {box}")
+
+    img = np.array(raw_image)
+    for bbox in bbox_list:
+        # payload={'image': b64_image}
+        bbox = [int(i) for i in bbox]
+        x1,y1,x2,y2 = bbox
+        img[y1:y2, x1:x2, 2] = 255
+    Image.fromarray(img).save('dino_output_image.png')
+
     return bbox_list
 
 
