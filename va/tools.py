@@ -4,6 +4,7 @@ import requests
 from utils import convert_image_to_base64
 import importlib.util
 import PIL
+import numpy as np
 
 class FUNCTIONS:
     """ All available functions for the GPT calling """
