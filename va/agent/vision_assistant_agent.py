@@ -148,7 +148,10 @@ class VisionAssistant(MultiController):
         else:
             namespace['INPUT'] = artifact_path
         step = 0
+
         self.print(Fore.YELLOW + messages[1]['content'])
+        self.print(Style.RESET_ALL)
+
         while True:
             ''' Inferecne '''
             response = self.llm.generate(messages=messages)
@@ -164,9 +167,8 @@ class VisionAssistant(MultiController):
 
             messages.append({"role": "user", "content": f"<step {step}> AGENT: {response_msg}"})
 
-
             if finalize_plan:
-                self.print(Fore.YELLOW + finalize_plan)
+                self.print(Fore.YELLOW + "Result:" + finalize_plan)
                 self.print(Style.RESET_ALL)
                 try:
                     if isinstance(namespace['result'], Image.Image) and self.debug:
@@ -178,19 +180,24 @@ class VisionAssistant(MultiController):
                 break
 
             # self.print the thinking process
-            self.print(Fore.GREEN + response_msg)
+            self.print(Fore.GREEN + f"<step {step}> AGENT: {thinking}")
             self.print(Style.RESET_ALL)
 
             if execute_python:
                 # execute_python = execution_check(execute_python)
                 try:
-                    self.print(Fore.CYAN + f" -- running {execute_python}")
+                    self.print(Fore.CYAN + f" === Code === {execute_python}")
+                    self.print(Fore.CYAN + f" === Code ===")
                     self.print(Style.RESET_ALL)
+
                     # Apply available tools for the function execution
                     if globals() is not locals():
                         namespace.update(locals())
+
+                    self.print(Fore.BLUE + "Run Time:")
                     exec(execute_python, namespace)
-                    obervation =  namespace['result']
+
+                    obervation = namespace['result']
                     if len(f"Observation: {obervation}") < 150:
                         self.print(Fore.BLUE + f"Observation: {obervation}")
                     else:
@@ -206,12 +213,15 @@ class VisionAssistant(MultiController):
                     tb = e.__traceback__
                     last_call_stack = traceback.extract_tb(tb)[-1]
                     # line = execute_python.splitlines()[last_call_stack.lineno-1]
-                    error_message = "OBSERVATION: Error on line \"{} \": {}: {}".format(last_call_stack.lineno, error_class, detail)
+                    error_message = "OBSERVATION: Error on line {}: {}: {}".format(last_call_stack.lineno, error_class, detail)
+
                     self.print(Fore.RED + error_message)
                     self.print(Style.RESET_ALL)
+
                     messages.append({"role": "user", "content": error_message})
             # If no action is detected then try to ask user to provide some feedback
             else:
                 self.print(Fore.RED + f"No action is detected, you can give some feedback by input")
+                self.print(Style.RESET_ALL)
                 break
         return None

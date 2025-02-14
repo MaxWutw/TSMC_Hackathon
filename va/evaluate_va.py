@@ -131,6 +131,7 @@ def evaluate(data, output_path, data_root):
     uuids = data.get('dataList')
     dataset_type = data.get('dataset')  # can only be either private or public
     max_workers = Config.EVAL_MAX_WORKER_PER_USER  # Default to 5 workers if not specified
+    
     if not va_url or not va_token or not dataset_type:
        	return jsonify({"error": "Missing required parameters"}), 400
 
@@ -147,7 +148,7 @@ def evaluate(data, output_path, data_root):
         ta_solution_df = pd.read_csv(Config.EVAL_PUBLIC_TA_SOLUTION_RELATIVE_PATH)
     else:
         return jsonify({"error": "dataset needs to be either private or public"})
-        
+    
     if uuids:
         # screen out the test cases that were not submitted by the user
         ta_solution_df = ta_solution_df[ta_solution_df['id'].isin(uuids)]
@@ -202,7 +203,7 @@ def get_payload(va_url, dataList):
     return payload
 
 if __name__ == '__main__':
-    va_url = "http://192.168.1.100:8003/vision"
+    va_url = "http://0.0.0.0:8001/vision"
     dataList = None
     # dataList = [
     #     "b377a2d3-bbec-4a0a-9a41-67513bf8e885"

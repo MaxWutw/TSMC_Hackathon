@@ -111,10 +111,10 @@ class FUNCTIONS:
         tic = time.time()
         response = requests.post(url, json=payload, headers=headers)
         toc = time.time()
-        print(f"DINO spend: {round(toc-tic, 3)} s")
+        print(f"DINO: {round(toc - tic, 3)}s")
         bboxes = None
         if response.status_code == 200:
-            print("Response from server:", response.json())
+            # print("Response from server:", response.json())
             bboxes = response.json()
         else:
             print("Failed to connect to the server")
@@ -152,7 +152,7 @@ class FUNCTIONS:
         tic = time.time()
         response = requests.post(url, json=payload, headers=headers)
         toc = time.time()
-        print(f"Inpainting spend: {round(toc - tic, 3)} s")
+        print(f"Inpainting: {round(toc - tic, 3)}s")
         if response.status_code == 200:
            # print("Response from server:", response.json())
            gen_image = response.json()['base64']
@@ -190,7 +190,7 @@ class FUNCTIONS:
         tic = time.time()
         response = requests.post(url, json=payload, headers=headers)
         toc = time.time()
-        print(f"Imagen spend: {round(toc - tic, 3)} s")
+        print(f"Imagen: {round(toc - tic, 3)}s")
         if response.status_code == 200:
            # print("Response from server:", response.json())
            gen_image = response.json()['base64']
