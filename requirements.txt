@@ -21,3 +21,4 @@ scikit-learn
 google-cloud-aiplatform
 gunicorn
 google-generativeai
+google-cloud-vision
