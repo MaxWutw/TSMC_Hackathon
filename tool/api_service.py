@@ -16,6 +16,7 @@ import io
 import importlib.util
 import base64
 from torchvision.ops.boxes import batched_nms
+import google.cloud.vision_v1 as vision
 
 app = Flask(__name__)
 @app.route('/imagen', methods=['POST'])
