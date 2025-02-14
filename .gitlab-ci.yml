@@ -61,6 +61,7 @@ testing:
   before_script:
     # - apt-get update && apt-get install -y python3-pip
     - pip install -r requirements-test.txt
+  script:
     - echo "$GCP_SERVICE_ACCOUNT_KEY" > va/tsmccareerhack2025.json
     - ls -la
     - ls -la tool/
@@ -75,7 +76,6 @@ testing:
     - sleep 10
     - ps aux | grep python
     - netstat -tlpn || echo "netstat not available"
-  script:
     - pytest tests/test_inpainting_service.py -v
     - pytest tests/test_imagen_service.py -v
     - pytest tests/test_va_service.py -v
